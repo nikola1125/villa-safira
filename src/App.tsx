@@ -28,10 +28,7 @@ import {
 } from "lucide-react";
 import axios from 'axios';
 
-const API_URL =
-    (process.env.NODE_ENV === 'production'
-        ? 'https://your-render-backend-url.onrender.com/api/reviews'
-        : 'http://localhost:5000/api/reviews');
+const API_URL = import.meta.env.VITE_API_URL;
 
 const apiClient = axios.create({
     baseURL: API_URL,
@@ -112,7 +109,7 @@ const App: React.FC = () => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const response = await axios.get(API_URL);
+                const response = await apiClient.get('/api/reviews');
                 setReviews(response.data);
             } catch (err) {
                 console.error('Error fetching reviews:', err);
@@ -128,7 +125,7 @@ const App: React.FC = () => {
         if (newReview.name && newReview.country && newReview.comment && newReview.rating) {
             try {
                 // Try to save to MongoDB first
-                const response = await axios.post(API_URL, {
+                const response = await axios.post('/api/reviews', {
                     name: newReview.name,
                     country: newReview.country,
                     comment: newReview.comment,
