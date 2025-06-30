@@ -28,9 +28,10 @@ import {
 } from "lucide-react";
 import axios from 'axios';
 
-const API_URL = process.env.NODE_ENV === 'production'
-    ? 'https://your-deployed-backend.com/api/reviews'
-    : 'http://localhost:5000/api/reviews';
+const API_URL =
+    (process.env.NODE_ENV === 'production'
+        ? 'https://your-render-backend-url.onrender.com/api/reviews'
+        : 'http://localhost:5000/api/reviews');
 
 const apiClient = axios.create({
     baseURL: API_URL,

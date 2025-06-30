@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({origin: 'https://villasafira.space'}));
 app.use(express.json());
 
 // Connect to MongoDB

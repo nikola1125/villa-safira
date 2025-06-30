@@ -9,19 +9,24 @@
 //   },
 // });
 
-import {defineConfig} from 'vite'
+// import {defineConfig} from 'vite'
+// import react from '@vitejs/plugin-react'
+//
+//
+// export default defineConfig({
+//   plugins: [react()],
+//   base: './', // For GitHub Pages
+//   build: {
+//     outDir: 'dist', // Frontend builds here
+//     emptyOutDir: true,
+//   },
+//   publicDir: 'public' // Static assets
+// })
+
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import {resolve} from 'path'
 
 export default defineConfig({
+  base: '/',
   plugins: [react()],
-  base: './', // Critical for GitHub Pages
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-    rollupOptions: {
-      input: resolve(__dirname, 'index.html')
-    }
-  },
-  publicDir: 'public'
 })
