@@ -1,11 +1,20 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const path = require('path');
 const app = express();
-app.use(cors({origin: 'https://villasafira.space'}));
+
+require('dotenv').config();
+
+app.use(cors({
+    origin: [
+        'https://villasafira.space',
+        'https://www.villasafira. space',
+        'http://localhost:5000' // For development
+    ]
+}));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -23,6 +32,7 @@ const reviewSchema = new mongoose.Schema({
 const Review = mongoose.model('Review', reviewSchema);
 
 // Routes
+
 app.post('/api/reviews', async (req, res) => {
     try {
         const review = new Review(req.body);
@@ -40,6 +50,10 @@ app.get('/api/reviews', async (req, res) => {
     } catch (err) {
         res.status(500).json({error: err.message});
     }
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;

@@ -4,6 +4,7 @@ import "aos/dist/aos.css";
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import Select from "react-select";
+// @ts-ignore
 import countryList from "react-select-country-list";
 import {
     Bath,
@@ -125,7 +126,7 @@ const App: React.FC = () => {
         if (newReview.name && newReview.country && newReview.comment && newReview.rating) {
             try {
                 // Try to save to MongoDB first
-                const response = await axios.post('/api/reviews', {
+                const response = await apiClient.post('/api/reviews', {
                     name: newReview.name,
                     country: newReview.country,
                     comment: newReview.comment,
