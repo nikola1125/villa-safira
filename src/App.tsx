@@ -167,7 +167,7 @@ const App: React.FC = () => {
                 "/dhome.jpg",
                 "/dhome0.jpg", "/dhome1.jpg", "/dhome2.jpg", "/dhome3.jpg",
                 "/dhome4.jpg", "/dhome5.jpg", "/dhome6.jpg", "/dhome7.jpg",
-                "/dhome8.jpg", "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg", "/dhome14.jpg", "/dhome15s.jpg"
+                "/dhome8.jpg", "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg", "/dhome14.jpg", "/dhome15.jpg", "/dhome22.jpg"
             ]
         },
         {
