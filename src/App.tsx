@@ -180,7 +180,7 @@ const App: React.FC = () => {
             id: "kitchen",
             title: "Kitchen",
             coverImage: "/kuzhin.jpg",
-            images: ["/kuzhin.jpg", "/kuzhin77.jpg", , "/kuzhin78.jpg", , "/kuzhin79.jpg", "/kuzhin2.jpg"]
+            images: ["/kuzhin.jpg", "/kuzhin77.jpg" , "/kuzhin78.jpg", "/kuzhin79.jpg", "/kuzhin2.jpg"]
         },
         {
             id: "outdoor",
