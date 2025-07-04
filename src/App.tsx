@@ -167,20 +167,20 @@ const App: React.FC = () => {
                 "/dhome.jpg",
                 "/dhome0.jpg", "/dhome1.jpg", "/dhome2.jpg", "/dhome3.jpg",
                 "/dhome4.jpg", "/dhome5.jpg", "/dhome6.jpg", "/dhome7.jpg",
-                "/dhome8.jpg", "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg", "/dhome14.jpg", "/dhome15.jpg", "/dhome22.jpg"
+                "/dhome8.jpg", "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg", "/dhome14.jpg", "/dhome15.jpg", "/dhome22.jpg", "/dhome22.jpg", "/dhome70.jpg", "/dhome71.jpg"
             ]
         },
         {
             id: "bathrooms",
             title: "Bathrooms",
             coverImage: "/banjo1.jpg",
-            images: ["/banjo1.jpg", "/banjo2.jpg", "/banjo4.jpg", "/banjo5.jpg"]
+            images: ["/banjo1.jpg", "/banjo2.jpg", "/banjo4.jpg", "/banjo5.jpg", "/banjo6.jpg", "/banjo7.jpg", "/banjo8.jpg"]
         },
         {
             id: "kitchen",
             title: "Kitchen",
             coverImage: "/kuzhin.jpg",
-            images: ["/kuzhin.jpg", "/kuzhin1.jpg", "/kuzhin2.jpg"]
+            images: ["/kuzhin.jpg", "/kuzhin77.jpg", , "/kuzhin78.jpg", , "/kuzhin79.jpg", "/kuzhin2.jpg"]
         },
         {
             id: "outdoor",
