@@ -11,10 +11,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.18",
+    "@fullcalendar/interaction": "^6.1.18",
+    "@fullcalendar/react": "^6.1.18",
     "aos": "^2.3.4",
     "axios": "^1.10.0",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
+    "react-calendar": "^6.0.0",
     "react-dom": "^18.3.1",
     "react-select": "^5.10.1",
     "react-select-country-list": "^2.2.3",

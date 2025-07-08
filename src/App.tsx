@@ -10,7 +10,7 @@ import {
     Bath,
     Bed,
     Calendar,
-    Car,
+    Car, Check,
     ChevronLeft,
     ChevronRight,
     Clock,
@@ -27,6 +27,7 @@ import {
     Wifi,
     X
 } from "lucide-react";
+// import BookingCalendar from './components/BookingCalendar';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -38,6 +39,7 @@ const apiClient = axios.create({
         'Content-Type': 'application/json'
     }
 });
+
 apiClient.interceptors.response.use(
     response => response,
     error => {
@@ -62,6 +64,7 @@ interface Review {
 }
 
 const App: React.FC = () => {
+    // const [showBookingCalendar, setShowBookingCalendar] = useState(false);
     const [scrollY, setScrollY] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -114,7 +117,6 @@ const App: React.FC = () => {
                 setReviews(response.data);
             } catch (err) {
                 console.error('Error fetching reviews:', err);
-                // Fallback to localStorage if API fails
                 const localReviews = JSON.parse(localStorage.getItem("reviews") || "[]");
                 setReviews(localReviews);
             }
@@ -125,7 +127,6 @@ const App: React.FC = () => {
     const handleAddReview = async () => {
         if (newReview.name && newReview.country && newReview.comment && newReview.rating) {
             try {
-                // Try to save to MongoDB first
                 const response = await apiClient.post('/api/reviews', {
                     name: newReview.name,
                     country: newReview.country,
@@ -133,19 +134,12 @@ const App: React.FC = () => {
                     rating: newReview.rating
                 });
 
-                // Update state with new review from MongoDB
                 setReviews(prev => [response.data, ...prev]);
-
-                // Also save to localStorage as fallback
                 const updatedReviews = [response.data, ...reviews];
                 localStorage.setItem("reviews", JSON.stringify(updatedReviews));
-
-                // Reset form
                 setNewReview({name: "", country: "", comment: "", rating: 5});
             } catch (err) {
                 console.error('Error saving to MongoDB, using localStorage instead:', err);
-
-                // Fallback to localStorage if API fails
                 const reviewToSave = {
                     ...newReview,
                     date: new Date().toLocaleDateString()
@@ -164,10 +158,10 @@ const App: React.FC = () => {
             title: "Bedrooms",
             coverImage: "/dhome1.jpg",
             images: [
-                "/dhome.jpg",
-                "/dhome0.jpg", "/dhome1.jpg", "/dhome2.jpg", "/dhome3.jpg",
-                "/dhome4.jpg", "/dhome5.jpg", "/dhome6.jpg", "/dhome7.jpg",
-                "/dhome8.jpg", "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg", "/dhome14.jpg", "/dhome15.jpg", "/dhome22.jpg", "/dhome22.jpg", "/dhome70.jpg", "/dhome71.jpg"
+                "/dhome.jpg", "/dhome0.jpg", "/dhome1.jpg", "/dhome2.jpg", "/dhome3.jpg",
+                "/dhome4.jpg", "/dhome5.jpg", "/dhome6.jpg", "/dhome7.jpg", "/dhome8.jpg",
+                "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg",
+                "/dhome14.jpg", "/dhome15.jpg", "/dhome22.jpg", "/dhome70.jpg", "/dhome71.jpg"
             ]
         },
         {
@@ -180,7 +174,7 @@ const App: React.FC = () => {
             id: "kitchen",
             title: "Kitchen",
             coverImage: "/kuzhin.jpg",
-            images: ["/kuzhin.jpg", "/kuzhin77.jpg" , "/kuzhin78.jpg", "/kuzhin79.jpg", "/kuzhin2.jpg"]
+            images: ["/kuzhin.jpg", "/kuzhin77.jpg", "/kuzhin78.jpg", "/kuzhin79.jpg", "/kuzhin2.jpg"]
         },
         {
             id: "outdoor",
@@ -190,8 +184,12 @@ const App: React.FC = () => {
         }
     ];
 
+    // const handleBookNowClick = () => {
+    //     setShowBookingCalendar(true);
+    // };
     const handleBookNow = () => window.open("https://www.booking.com/hotel/al/villa-sol-durres.html", "_blank");
-    const handleContactNow = () => window.location.href = "mailto:villasafiradurres@gmail.com";
+
+    // const handleContactNow = () => window.location.href = "mailto:villasafiradurres@gmail.com";
 
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id);
@@ -200,7 +198,19 @@ const App: React.FC = () => {
             setIsMenuOpen(false);
         }
     };
+    const handleContactNow = (e: React.MouseEvent) => {
+        // Solution 1: Most reliable - works in 99% of cases
+        window.location.href = 'mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira';
 
+        // Solution 2: Alternative method (if first fails)
+        try {
+            const a = document.createElement('a');
+            a.href = 'mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira';
+            a.click();
+        } catch (err) {
+            console.error('Email client failed to open:', err);
+        }
+    };
     const renderStars = (rating: number) => (
         <div className="flex gap-1 mt-1">
             {[1, 2, 3, 4, 5].map(i =>
@@ -221,7 +231,6 @@ const App: React.FC = () => {
                         Villa Safira
                     </div>
 
-                    {/* Mobile Menu Button */}
                     <button className="sm:hidden text-amber-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isMenuOpen ? (
@@ -234,7 +243,6 @@ const App: React.FC = () => {
                         </svg>
                     </button>
 
-                    {/* Desktop Menu */}
                     <ul className="hidden sm:flex space-x-4 sm:space-x-6 md:space-x-8 text-sm sm:text-base md:text-lg font-semibold text-amber-900">
                         {["about", "gallery", "facilities", "reviews"].map(sec => (
                             <li key={sec}
@@ -253,7 +261,6 @@ const App: React.FC = () => {
                     </ul>
                 </div>
 
-                {/* Mobile Menu */}
                 {isMenuOpen && (
                     <div className="sm:hidden bg-amber-100 py-2 px-4">
                         {["about", "gallery", "facilities", "reviews", "contact"].map(sec => (
@@ -287,7 +294,8 @@ const App: React.FC = () => {
                          }}/>
                 ))}
                 <div className="absolute inset-0 bg-amber-900/40"/>
-                <div className="relative z-10 text-center text-amber-50 px-4 sm:px-6 max-w-xs sm:max-w-md md:max-w-3xl">
+                <div
+                    className="relative z-10 text-center text-amber-50 px-4 sm:px-6 max-w-xs sm:max-w-md md:max-w-3xl">
                     <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mb-4 sm:mb-6 font-extrabold"
                         data-aos="fade-up"
                         data-aos-duration="1000">
@@ -303,13 +311,17 @@ const App: React.FC = () => {
                          data-aos="fade-up"
                          data-aos-delay="1200"
                          data-aos-duration="600">
-                        <button onClick={handleBookNow}
-                                className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold shadow-lg transition-transform hover:scale-105">
-                            <Calendar className="inline-block mr-1 sm:mr-2" size={isMobile ? 16 : 20}/> Book Now
+                        <button
+                            onClick={handleBookNow}
+                            className=" bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105"
+                        >
+                            <Calendar className="inline-block mr-2" size={isMobile ? 16 : 20}/>
+                            Check Availability & Book
                         </button>
-                        <button onClick={handleContactNow}
-                                className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105">
-                            <Mail className="inline-block mr-1 sm:mr-2" size={isMobile ? 16 : 20}/> Contact Now
+                        <button
+                            className=" bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105"
+
+                            onClick={handleContactNow}>Contact Now
                         </button>
                     </div>
                 </div>
@@ -325,7 +337,8 @@ const App: React.FC = () => {
                     <img src="/dhome7.jpg" alt="Villa Exterior"
                          className="rounded-xl sm:rounded-2xl shadow-lg w-full h-auto"
                          data-aos="fade-right"/>
-                    <p className="text-sm sm:text-base md:text-lg leading-relaxed text-amber-900" data-aos="fade-left">
+                    <p className="text-sm sm:text-base md:text-lg leading-relaxed text-amber-900"
+                       data-aos="fade-left">
                         Welcome to Villa Safira, a charming 4-floor B&B just a short walk from the sea in Durrës!
                         We offer 4 stylish rooms (3 with private balconies and garden view, 1 with garden view
                         only), each with cozy decor and all the comforts you need. Breakfast is included, and
@@ -341,7 +354,8 @@ const App: React.FC = () => {
                      className="py-12 sm:py-16 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 md:mb-16 text-amber-900"
                     data-aos="fade-up">Facilities & Amenities</h2>
-                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                <div
+                    className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
                     {[
                         {icon: Wifi, text: "Free Wi‑Fi"},
                         {icon: Coffee, text: "Breakfast Included"},
@@ -420,6 +434,56 @@ const App: React.FC = () => {
                 />
             </section>
 
+            {/* Booking Section */}
+            {/* Booking Section */}
+            <section id="booking" className="py-12 sm:py-16 max-w-6xl mx-auto px-4 sm:px-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-amber-900">
+                    Book Your Stay
+                </h2>
+
+                <div className="bg-amber-100 rounded-xl p-6 sm:p-8 shadow-md">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 className="text-xl sm:text-2xl font-bold text-amber-900 mb-4">
+                                Ready to experience Villa Safira?
+                            </h3>
+                            <p className="text-amber-900 mb-6">
+                                Check availability for your preferred dates and book directly with us.
+                                We offer secure payments through Paysera.
+                            </p>
+                            <ul className="space-y-3 text-amber-900">
+                                <li className="flex items-start gap-2">
+                                    <Check className="text-amber-700 mt-1 flex-shrink-0" size={18}/>
+                                    <span>Best price guarantee</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <Check className="text-amber-700 mt-1 flex-shrink-0" size={18}/>
+                                    <span>No booking fees</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <Check className="text-amber-700 mt-1 flex-shrink-0" size={18}/>
+                                    <span>Secure payment processing</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="text-center">
+                            <button
+                                onClick={handleBookNow}
+                                className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-6 py-4 rounded-full text-lg font-semibold shadow-lg transition-transform hover:scale-105 w-full max-w-xs"
+                            >
+                                <Calendar className="inline-block mr-2" size={24}/>
+                                Check Availability & Book
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/*{showBookingCalendar && (*/}
+            {/*    <BookingCalendar onClose={() => setShowBookingCalendar(false)}/>*/}
+            {/*)}*/}
             {/* Reviews Section */}
             <section id="reviews"
                      className="py-12 sm:py-16 md:py-20 max-w-4xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"
@@ -518,7 +582,9 @@ const App: React.FC = () => {
                         <ul className="space-y-1 sm:space-y-2">
                             {["about", "gallery", "facilities", "reviews"].map(sec => (
                                 <li key={sec}
-                                    className="cursor-pointer hover:underline text-sm sm:text-base"
+                                    className="underline hover:text-amber-700 mouse-pointer"
+                                    aria-label="Contact Villa Safira via email"
+                                    rel="noopener noreferrer"
                                     onClick={() => scrollToSection(sec)}>
                                     {sec.charAt(0).toUpperCase() + sec.slice(1)}
                                 </li>
@@ -528,20 +594,21 @@ const App: React.FC = () => {
 
                     <div className="md:w-5/12 space-y-1 sm:space-y-2">
                         <h4 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4">Contact</h4>
-                        <p className="text-sm sm:text-base">📍 <a href="https://maps.app.goo.gl/hZa8t1TER1ymqn338"
-                                                                 target="_blank" rel="noopener noreferrer"
-                                                                 className="underline hover:text-amber-700">Durrës,
+                        <p className="text-sm sm:text-base"
+                           aria-label="Contact Villa Safira via email">📍 <a
+                            href="https://maps.app.goo.gl/hZa8t1TER1ymqn338"
+                            target="_blank" rel="noopener noreferrer"
+                            className="underline hover:text-amber-700">Durrës,
                             Albania</a></p>
-                        <p className="text-sm sm:text-base">📧 <a
-                            href="mailto:villasafiradurres@gmail.com"
-                            className="underline hover:text-amber-700 transition-colors"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                window.location.href = 'mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira';
-                            }}
-                        >
-                            villasafiradurres@gmail.com
-                        </a></p>
+                        <p className="text-sm sm:text-base">
+                            📧{' '}
+                            <a
+                                href="mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira"
+                                className="underline hover:text-amber-700 "
+                            >
+                                Contact Now
+                            </a>
+                        </p>
                         <p className="text-sm sm:text-base">📞 +355692429567</p>
                     </div>
                 </div>
@@ -554,5 +621,5 @@ const App: React.FC = () => {
     );
 };
 
-export default App
-export {apiClient}
+export default App;
+export {apiClient};
