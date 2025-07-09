@@ -156,31 +156,31 @@ const App: React.FC = () => {
         {
             id: "bedrooms",
             title: "Bedrooms",
-            coverImage: "/dhome1.jpg",
+            coverImage: "./dhome1.jpg",
             images: [
-                "/dhome.jpg", "/dhome0.jpg", "/dhome1.jpg", "/dhome2.jpg", "/dhome3.jpg",
-                "/dhome4.jpg", "/dhome5.jpg", "/dhome6.jpg", "/dhome7.jpg", "/dhome8.jpg",
-                "/dhome9.jpg", "/dhome10.jpg", "/dhome11.jpg", "/dhome12.jpg", "/dhome13.jpg",
-                "/dhome14.jpg", "/dhome15.jpg", "/dhome22.jpg", "/dhome70.jpg", "/dhome71.jpg"
+                "./dhome.jpg", "./dhome0.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome3.jpg",
+                "./dhome4.jpg", "./dhome5.jpg", "./dhome6.jpg", "./dhome7.jpg", "./dhome8.jpg",
+                "./dhome9.jpg", "./dhome10.jpg", "./dhome11.jpg", "./dhome12.jpg", "./dhome13.jpg",
+                "./dhome14.jpg", "./dhome15.jpg", "./dhome22.jpg", "./dhome70.jpg", "./dhome71.jpg"
             ]
         },
         {
             id: "bathrooms",
             title: "Bathrooms",
-            coverImage: "/banjo1.jpg",
-            images: ["/banjo1.jpg", "/banjo2.jpg", "/banjo4.jpg", "/banjo5.jpg", "/banjo6.jpg", "/banjo7.jpg", "/banjo8.jpg"]
+            coverImage: "./banjo1.jpg",
+            images: ["./banjo1.jpg", "./banjo2.jpg", "./banjo4.jpg", "./banjo5.jpg", "./banjo6.jpg", "./banjo7.jpg", "./banjo8.jpg"]
         },
         {
             id: "kitchen",
             title: "Kitchen",
-            coverImage: "/kuzhin.jpg",
-            images: ["/kuzhin.jpg", "/kuzhin77.jpg", "/kuzhin78.jpg", "/kuzhin79.jpg", "/kuzhin2.jpg"]
+            coverImage: "./kuzhin.jpg",
+            images: ["./kuzhin.jpg", "./kuzhin77.jpg", "./kuzhin78.jpg", "./kuzhin79.jpg", "./kuzhin2.jpg"]
         },
         {
             id: "outdoor",
             title: "Outdoor",
-            coverImage: "/jasht1.jpg",
-            images: ["/jasht1.jpg", "/jasht2.jpg", "/jasht3.jpg", "/jasht4.jpg", "/jasht5.jpg", "/jasht6.jpg", "/jasht7.jpg", "/jasht8.jpg"]
+            coverImage: "./jasht1.jpg",
+            images: ["./jasht1.jpg", "./jasht2.jpg", "./jasht3.jpg", "./jasht4.jpg", "./jasht5.jpg", "./jasht6.jpg", "./jasht7.jpg", "./jasht8.jpg"]
         }
     ];
 
@@ -283,8 +283,8 @@ const App: React.FC = () => {
                          className="absolute inset-0 bg-fixed bg-center transition-opacity duration-1000 ease-in-out"
                          style={{
                              backgroundImage: `url(${idx === 0
-                                 ? (scrollY < window.innerHeight ? "/jasht3.jpg" : "/dhome7.jpg")
-                                 : (scrollY >= window.innerHeight ? "/dhome7.jpg" : "/jasht3.jpg")
+                                 ? (scrollY < window.innerHeight ? "./jasht3.jpg" : "./dhome7.jpg")
+                                 : (scrollY >= window.innerHeight ? "./dhome7.jpg" : "./jasht3.jpg")
                              })`,
                              opacity: idx === 0
                                  ? (scrollY < window.innerHeight ? 1 : 0)
@@ -334,7 +334,7 @@ const App: React.FC = () => {
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 text-amber-900"
                     data-aos="fade-up">About Villa Safira</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
-                    <img src="/dhome7.jpg" alt="Villa Exterior"
+                    <img src="./dhome7.jpg" alt="Villa Exterior"
                          className="rounded-xl sm:rounded-2xl shadow-lg w-full h-auto"
                          data-aos="fade-right"/>
                     <p className="text-sm sm:text-base md:text-lg leading-relaxed text-amber-900"
@@ -441,8 +441,10 @@ const App: React.FC = () => {
                     Book Your Stay
                 </h2>
 
-                <div className="bg-amber-100 rounded-xl p-6 sm:p-8 shadow-md">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div className="bg-amber-100 rounded-xl p-6 sm:p-8 shadow-md" data-aos="fade-up">
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+                    >
                         <div>
                             <h3 className="text-xl sm:text-2xl font-bold text-amber-900 mb-4">
                                 Ready to experience Villa Safira?
@@ -467,7 +469,8 @@ const App: React.FC = () => {
                             </ul>
                         </div>
 
-                        <div className="text-center">
+                        <div className="text-center" data-aos="fade-up"
+                        >
                             <button
                                 onClick={handleBookNow}
                                 className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-6 py-4 rounded-full text-lg font-semibold shadow-lg transition-transform hover:scale-105 w-full max-w-xs"
@@ -481,10 +484,8 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/*{showBookingCalendar && (*/}
-            {/*    <BookingCalendar onClose={() => setShowBookingCalendar(false)}/>*/}
-            {/*)}*/}
-            {/* Reviews Section */}
+            {/*review section*/
+            }
             <section id="reviews"
                      className="py-12 sm:py-16 md:py-20 max-w-4xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"
                      data-aos="fade-up">
@@ -565,7 +566,8 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/* Footer */}
+            {/* Footer */
+            }
             <footer className="bg-amber-900 text-amber-50 py-8 sm:py-12 backdrop-blur-sm border-t border-amber-200">
                 <div
                     className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between gap-6 sm:gap-8 md:gap-0">
@@ -606,7 +608,7 @@ const App: React.FC = () => {
                                 href="mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira"
                                 className="underline hover:text-amber-700 "
                             >
-                                Contact Now
+                                villasafiradurres@gmail.com
                             </a>
                         </p>
                         <p className="text-sm sm:text-base">📞 +355692429567</p>
@@ -618,7 +620,8 @@ const App: React.FC = () => {
                 </div>
             </footer>
         </div>
-    );
+    )
+        ;
 };
 
 export default App;

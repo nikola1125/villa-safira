@@ -28,7 +28,7 @@ import react from '@vitejs/plugin-react'
 import {resolve} from 'path'
 
 export default defineConfig({
-  base: '/',
+  base: './',
   plugins: [react()],
 
   build: {
