@@ -64,3 +64,22 @@ body {
 .fc-daygrid-day:hover {
     background-color: #fef3c7 !important;
 }
+
+@supports (-webkit-touch-callout: none) {
+    /* Safari-specific styles */
+    .bg-fixed {
+        -webkit-background-attachment: scroll !important;
+        background-attachment: scroll !important;
+    }
+
+    .bg-cover {
+        -webkit-background-size: cover !important;
+        background-size: cover !important;
+    }
+}
+@supports (-webkit-touch-callout: none) {
+    .your-background-class {
+        -webkit-background-attachment: scroll;
+        background-attachment: scroll;
+    }
+}

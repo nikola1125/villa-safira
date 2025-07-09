@@ -306,14 +306,20 @@ const App: React.FC = () => {
                          className="absolute inset-0 bg-fixed bg-center transition-opacity duration-1000 ease-in-out"
                          style={{
                              backgroundImage: `url(${idx === 0
-                                 ? (scrollY < window.innerHeight ? "./jasht3.jpg" : "./dhome7.jpg")
-                                 : (scrollY >= window.innerHeight ? "./dhome7.jpg" : "./jasht3.jpg")
+                                 ? (scrollY < window.innerHeight ? "/jasht3.jpg" : "/dhome7.jpg")
+                                 : (scrollY >= window.innerHeight ? "/dhome7.jpg" : "/jasht3.jpg")
                              })`,
                              opacity: idx === 0
                                  ? (scrollY < window.innerHeight ? 1 : 0)
                                  : (scrollY >= window.innerHeight ? 1 : 0),
                              backgroundSize: "cover",
-                             backgroundPosition: "center 30%"
+                             backgroundPosition: "center 30%",
+                             // Safari-specific fixes:
+                             WebkitBackgroundSize: "cover",
+                             WebkitTransform: "translate3d(0,0,0)",
+                             transform: "translate3d(0,0,0)",
+                             backfaceVisibility: "hidden",
+                             willChange: "transform"
                          }}/>
                 ))}
                 <div className="absolute inset-0 bg-amber-900/40"/>
