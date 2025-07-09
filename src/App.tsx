@@ -27,7 +27,6 @@ import {
     Wifi,
     X
 } from "lucide-react";
-// import BookingCalendar from './components/BookingCalendar';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -64,7 +63,6 @@ interface Review {
 }
 
 const App: React.FC = () => {
-    // const [showBookingCalendar, setShowBookingCalendar] = useState(false);
     const [scrollY, setScrollY] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -84,6 +82,13 @@ const App: React.FC = () => {
     });
 
     const countryOptions = countryList().getData();
+
+    const openWhatsApp = () => {
+        const phoneNumber = '+355692429567';
+        const message = 'Hello, I have a question about Villa Safira';
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
 
     useEffect(() => {
         AOS.init({
@@ -184,12 +189,7 @@ const App: React.FC = () => {
         }
     ];
 
-    // const handleBookNowClick = () => {
-    //     setShowBookingCalendar(true);
-    // };
     const handleBookNow = () => window.open("https://www.booking.com/hotel/al/villa-sol-durres.html", "_blank");
-
-    // const handleContactNow = () => window.location.href = "mailto:villasafiradurres@gmail.com";
 
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id);
@@ -198,19 +198,7 @@ const App: React.FC = () => {
             setIsMenuOpen(false);
         }
     };
-    const handleContactNow = (e: React.MouseEvent) => {
-        // Solution 1: Most reliable - works in 99% of cases
-        window.location.href = 'mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira';
 
-        // Solution 2: Alternative method (if first fails)
-        try {
-            const a = document.createElement('a');
-            a.href = 'mailto:villasafiradurres@gmail.com?subject=Inquiry%20about%20Villa%20Safira';
-            a.click();
-        } catch (err) {
-            console.error('Email client failed to open:', err);
-        }
-    };
     const renderStars = (rating: number) => (
         <div className="flex gap-1 mt-1">
             {[1, 2, 3, 4, 5].map(i =>
@@ -320,8 +308,9 @@ const App: React.FC = () => {
                         </button>
                         <button
                             className=" bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105"
-
-                            onClick={handleContactNow}>Contact Now
+                            onClick={openWhatsApp}
+                        >
+                            Contact Now
                         </button>
                     </div>
                 </div>
@@ -435,16 +424,13 @@ const App: React.FC = () => {
             </section>
 
             {/* Booking Section */}
-            {/* Booking Section */}
             <section id="booking" className="py-12 sm:py-16 max-w-6xl mx-auto px-4 sm:px-6">
                 <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-amber-900">
                     Book Your Stay
                 </h2>
 
                 <div className="bg-amber-100 rounded-xl p-6 sm:p-8 shadow-md" data-aos="fade-up">
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
-                    >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                         <div>
                             <h3 className="text-xl sm:text-2xl font-bold text-amber-900 mb-4">
                                 Ready to experience Villa Safira?
@@ -469,8 +455,7 @@ const App: React.FC = () => {
                             </ul>
                         </div>
 
-                        <div className="text-center" data-aos="fade-up"
-                        >
+                        <div className="text-center" data-aos="fade-up">
                             <button
                                 onClick={handleBookNow}
                                 className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-6 py-4 rounded-full text-lg font-semibold shadow-lg transition-transform hover:scale-105 w-full max-w-xs"
@@ -478,14 +463,12 @@ const App: React.FC = () => {
                                 <Calendar className="inline-block mr-2" size={24}/>
                                 Check Availability & Book
                             </button>
-
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/*review section*/
-            }
+            {/* Review Section */}
             <section id="reviews"
                      className="py-12 sm:py-16 md:py-20 max-w-4xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"
                      data-aos="fade-up">
@@ -566,8 +549,7 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/* Footer */
-            }
+            {/* Footer */}
             <footer className="bg-amber-900 text-amber-50 py-8 sm:py-12 backdrop-blur-sm border-t border-amber-200">
                 <div
                     className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between gap-6 sm:gap-8 md:gap-0">
@@ -611,7 +593,21 @@ const App: React.FC = () => {
                                 villasafiradurres@gmail.com
                             </a>
                         </p>
-                        <p className="text-sm sm:text-base">📞 +355692429567</p>
+                        <p className="text-sm sm:text-base">
+                            📞{' '}
+                            {isMobile ? (
+                                <a
+                                    href={`https://wa.me/+355692429567`}
+                                    className="underline hover:text-amber-700"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    +355692429567
+                                </a>
+                            ) : (
+                                '+355692429567'
+                            )}
+                        </p>
                     </div>
                 </div>
                 <div
@@ -620,8 +616,7 @@ const App: React.FC = () => {
                 </div>
             </footer>
         </div>
-    )
-        ;
+    );
 };
 
 export default App;
