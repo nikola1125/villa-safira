@@ -176,24 +176,24 @@ const App: React.FC = () => {
         {
             id: "bedrooms",
             title: "Bedrooms",
-            coverImage: "./dhome1.jpg",
+            coverImage: "./dhome3.jpg",
             images: [
                 "./dhome.jpg", "./dhome0.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome3.jpg",
-                "./dhome4.jpg", "./dhome5.jpg", "./dhome6.jpg", "./dhome7.jpg", "./dhome8.jpg",
-                "./dhome9.jpg", "./dhome10.jpg", "./dhome11.jpg", "./dhome12.jpg", "./dhome13.jpg",
+                "./dhome4.jpg", "./dhome6.jpg", "./dhome7.jpg", "./dhome8.jpg",
+                "./dhome10.jpg", "./dhome11.jpg", "./dhome12.jpg", "./dhome13.jpg",
                 "./dhome14.jpg", "./dhome15.jpg", "./dhome22.jpg", "./dhome70.jpg", "./dhome71.jpg"
             ]
         },
         {
             id: "bathrooms",
             title: "Bathrooms",
-            coverImage: "./banjo1.jpg",
+            coverImage: "./banjo7.jpg",
             images: ["./banjo1.jpg", "./banjo2.jpg", "./banjo4.jpg", "./banjo5.jpg", "./banjo6.jpg", "./banjo7.jpg", "./banjo8.jpg"]
         },
         {
             id: "kitchen",
             title: "Kitchen",
-            coverImage: "./kuzhin.jpg",
+            coverImage: "./kuzhin77.jpg",
             images: ["./kuzhin.jpg", "./kuzhin77.jpg", "./kuzhin78.jpg", "./kuzhin79.jpg", "./kuzhin2.jpg"]
         },
         {
@@ -206,11 +206,13 @@ const App: React.FC = () => {
 
     const handleBookNow = () => window.open("https://www.booking.com/hotel/al/villa-sol-durres.html", "_blank");
 
-    const scrollToSection = (id: string) => {
+    const scrollToSection = (id: string, shouldToggleMenu = true) => {
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({behavior: "smooth"});
-            toggleMenu();
+            if (shouldToggleMenu) {
+                toggleMenu();
+            }
         }
     };
 
@@ -247,7 +249,7 @@ const App: React.FC = () => {
                     </button>
 
                     <ul className="hidden sm:flex space-x-4 sm:space-x-6 md:space-x-8 text-sm sm:text-base md:text-lg font-semibold text-amber-900">
-                        {["about", "gallery", "facilities", "reviews"].map(sec => (
+                        {["about", "gallery", "facilities", "reviews", "contact"].map(sec => (
                             <li key={sec}
                                 className="cursor-pointer hover:text-amber-700 transition"
                                 onClick={() => scrollToSection(sec)}>
@@ -281,17 +283,25 @@ const App: React.FC = () => {
                                             menuAnimation === 'closing' ? 'opacity-0 -translate-y-2' :
                                                 'opacity-0'
                                 }`}
-                                style={{transitionDelay: menuAnimation === 'opening' ? `${0.1 * ["about", "gallery", "facilities", "reviews", "contact"].indexOf(sec)}s` : '0s'}}
                             >
-                                <span
-                                    className="cursor-pointer hover:text-amber-700 transition block"
-                                    onClick={() => {
-                                        scrollToSection(sec === "contact" ? "" : sec);
-                                        toggleMenu();
-                                    }}
-                                >
-                                    {sec.charAt(0).toUpperCase() + sec.slice(1)}
-                                </span>
+        <span
+            className="cursor-pointer hover:text-amber-700 transition block"
+            onClick={() => {
+                if (sec === "contact") {
+                    // Scroll to footer
+                    const footer = document.querySelector('footer');
+                    if (footer) {
+                        footer.scrollIntoView({behavior: 'smooth'});
+                    }
+                } else {
+                    // Scroll to regular section
+                    scrollToSection(sec);
+                }
+                toggleMenu();
+            }}
+        >
+            {sec.charAt(0).toUpperCase() + sec.slice(1)}
+        </span>
                             </div>
                         ))}
                     </div>
@@ -606,12 +616,17 @@ const App: React.FC = () => {
                         <h4 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4">Quick Links</h4>
                         <ul className="space-y-1 sm:space-y-2">
                             {["about", "gallery", "facilities", "reviews"].map(sec => (
-                                <li key={sec}
-                                    className="underline hover:text-amber-700 mouse-pointer"
-                                    aria-label="Contact Villa Safira via email"
-                                    rel="noopener noreferrer"
-                                    onClick={() => scrollToSection(sec)}>
-                                    {sec.charAt(0).toUpperCase() + sec.slice(1)}
+                                <li key={sec}>
+                                    <button
+                                        className="underline hover:text-amber-700 cursor-pointer w-full text-left"
+                                        aria-label={`Jump to ${sec} section`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            scrollToSection(sec, false); // Notice the false here
+                                        }}
+                                    >
+                                        {sec.charAt(0).toUpperCase() + sec.slice(1)}
+                                    </button>
                                 </li>
                             ))}
                         </ul>
