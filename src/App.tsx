@@ -88,13 +88,13 @@ const App: React.FC = () => {
         if (!isMenuOpen) {
             setIsMenuOpen(true);
             setMenuAnimation('opening');
-            setTimeout(() => setMenuAnimation('open'), 50);
+            setTimeout(() => setMenuAnimation('open'), 100);
         } else {
             setMenuAnimation('closing');
             setTimeout(() => {
                 setIsMenuOpen(false);
                 setMenuAnimation('closed');
-            }, 300);
+            }, 400);
         }
     };
 
@@ -265,12 +265,13 @@ const App: React.FC = () => {
                 </div>
 
                 {isMenuOpen && (
-                    <div className={`sm:hidden bg-amber-100 py-2 px-4 overflow-hidden transition-all duration-300 ease-in-out ${
-                        menuAnimation === 'opening' ? 'max-h-0 opacity-0' :
-                            menuAnimation === 'open' ? 'max-h-screen opacity-100' :
-                                menuAnimation === 'closing' ? 'max-h-0 opacity-0' :
-                                    'max-h-0 opacity-0'
-                    }`}>
+                    <div
+                        className={`sm:hidden bg-amber-100 py-2 px-4 overflow-hidden transition-all duration-300 ease-in-out ${
+                            menuAnimation === 'opening' ? 'max-h-0 opacity-0' :
+                                menuAnimation === 'open' ? 'max-h-screen opacity-100' :
+                                    menuAnimation === 'closing' ? 'max-h-0 opacity-0' :
+                                        'max-h-0 opacity-0'
+                        }`}>
                         {["about", "gallery", "facilities", "reviews", "contact"].map((sec) => (
                             <div
                                 key={sec}
@@ -280,7 +281,7 @@ const App: React.FC = () => {
                                             menuAnimation === 'closing' ? 'opacity-0 -translate-y-2' :
                                                 'opacity-0'
                                 }`}
-                                style={{ transitionDelay: menuAnimation === 'opening' ? `${0.1 * ["about", "gallery", "facilities", "reviews", "contact"].indexOf(sec)}s` : '0s' }}
+                                style={{transitionDelay: menuAnimation === 'opening' ? `${0.1 * ["about", "gallery", "facilities", "reviews", "contact"].indexOf(sec)}s` : '0s'}}
                             >
                                 <span
                                     className="cursor-pointer hover:text-amber-700 transition block"
