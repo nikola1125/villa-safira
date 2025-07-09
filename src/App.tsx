@@ -106,6 +106,15 @@ const App: React.FC = () => {
     };
 
     useEffect(() => {
+        // Prevent zooming on mobile
+        const handleTouchMove = (e: TouchEvent) => {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        };
+
+        document.addEventListener('touchmove', handleTouchMove, {passive: false});
+
         AOS.init({
             once: true,
             duration: 800,
@@ -115,7 +124,12 @@ const App: React.FC = () => {
         });
 
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 640);
+            setIsMobile(window.innerWidth < 768); // Changed to 768 for better tablet handling
+            // Set viewport meta tag to prevent zooming
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0');
+            }
         };
 
         handleResize();
@@ -125,6 +139,7 @@ const App: React.FC = () => {
         window.addEventListener("scroll", onScroll);
 
         return () => {
+            document.removeEventListener('touchmove', handleTouchMove);
             window.removeEventListener('resize', handleResize);
             window.removeEventListener("scroll", onScroll);
         };
@@ -178,7 +193,7 @@ const App: React.FC = () => {
             title: "Bedrooms",
             coverImage: "./dhome3.jpg",
             images: [
-                "./dhome.jpg", "./dhome0.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome3.jpg",
+                "./dhome3.jpg", "./dhome0.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome.jpg",
                 "./dhome4.jpg", "./dhome6.jpg", "./dhome8.jpg",
                 "./dhome10.jpg", "./dhome11.jpg", "./dhome12.jpg", "./dhome13.jpg",
                 "./dhome14.jpg", "./dhome15.jpg", "./dhome22.jpg", "./dhome70.jpg", "./dhome71.jpg"
@@ -188,13 +203,13 @@ const App: React.FC = () => {
             id: "bathrooms",
             title: "Bathrooms",
             coverImage: "./banjo7.jpg",
-            images: ["./banjo1.jpg", "./banjo2.jpg", "./banjo4.jpg", "./banjo5.jpg", "./banjo6.jpg", "./banjo7.jpg", "./banjo8.jpg"]
+            images: ["./banjo7.jpg", "./banjo2.jpg", "./banjo5.jpg", "./banjo6.jpg", "./banjo1.jpg", "./banjo8.jpg"]
         },
         {
             id: "kitchen",
             title: "Kitchen",
             coverImage: "./kuzhin77.jpg",
-            images: ["./kuzhin.jpg", "./kuzhin77.jpg", "./kuzhin78.jpg", "./kuzhin79.jpg", "./kuzhin2.jpg"]
+            images: ["./kuzhin77.jpg", "./kuzhin.jpg", "./kuzhin78.jpg", "./kuzhin79.jpg", "./kuzhin2.jpg"]
         },
         {
             id: "outdoor",
@@ -210,7 +225,7 @@ const App: React.FC = () => {
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({behavior: "smooth"});
-            if (shouldToggleMenu) {
+            if (shouldToggleMenu && isMenuOpen) {
                 toggleMenu();
             }
         }
@@ -228,6 +243,9 @@ const App: React.FC = () => {
 
     return (
         <div className="font-poppins bg-amber-50 text-amber-900 min-h-screen">
+            {/* Add viewport meta tag in React */}
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+
             {/* Navbar */}
             <nav className="fixed w-full bg-amber-100/90 shadow-md backdrop-blur-sm z-50 border-b border-amber-200">
                 <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3 sm:px-6 sm:py-4">
@@ -236,7 +254,11 @@ const App: React.FC = () => {
                         Villa Safira
                     </div>
 
-                    <button className="sm:hidden text-amber-900" onClick={toggleMenu}>
+                    <button
+                        className="sm:hidden text-amber-900 p-2"
+                        onClick={toggleMenu}
+                        aria-label="Toggle menu"
+                    >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isMenuOpen ? (
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -249,7 +271,7 @@ const App: React.FC = () => {
                     </button>
 
                     <ul className="hidden sm:flex space-x-4 sm:space-x-6 md:space-x-8 text-sm sm:text-base md:text-lg font-semibold text-amber-900">
-                        {["about", "gallery", "facilities", "reviews", "contact"].map(sec => (
+                        {["about", "gallery", "facilities", "reviews"].map(sec => (
                             <li key={sec}
                                 className="cursor-pointer hover:text-amber-700 transition"
                                 onClick={() => scrollToSection(sec)}>
@@ -283,25 +305,22 @@ const App: React.FC = () => {
                                             menuAnimation === 'closing' ? 'opacity-0 -translate-y-2' :
                                                 'opacity-0'
                                 }`}
+                                style={{transitionDelay: menuAnimation === 'opening' ? `${0.1 * ["about", "gallery", "facilities", "reviews", "contact"].indexOf(sec)}s` : '0s'}}
                             >
-        <span
-            className="cursor-pointer hover:text-amber-700 transition block"
-            onClick={() => {
-                if (sec === "contact") {
-                    // Scroll to footer
-                    const footer = document.querySelector('footer');
-                    if (footer) {
-                        footer.scrollIntoView({behavior: 'smooth'});
-                    }
-                } else {
-                    // Scroll to regular section
-                    scrollToSection(sec);
-                }
-                toggleMenu();
-            }}
-        >
-            {sec.charAt(0).toUpperCase() + sec.slice(1)}
-        </span>
+                                <button
+                                    className="w-full text-left cursor-pointer hover:text-amber-700 transition"
+                                    onClick={() => {
+                                        if (sec === "contact") {
+                                            const footer = document.querySelector('footer');
+                                            if (footer) footer.scrollIntoView({behavior: 'smooth'});
+                                        } else {
+                                            scrollToSection(sec);
+                                        }
+                                        toggleMenu();
+                                    }}
+                                >
+                                    {sec.charAt(0).toUpperCase() + sec.slice(1)}
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -324,12 +343,6 @@ const App: React.FC = () => {
                                  : (scrollY >= window.innerHeight ? 1 : 0),
                              backgroundSize: "cover",
                              backgroundPosition: "center 30%",
-                             // Safari-specific fixes:
-                             WebkitBackgroundSize: "cover",
-                             WebkitTransform: "translate3d(0,0,0)",
-                             transform: "translate3d(0,0,0)",
-                             backfaceVisibility: "hidden",
-                             willChange: "transform"
                          }}/>
                 ))}
                 <div className="absolute inset-0 bg-amber-900/40"/>
@@ -352,13 +365,13 @@ const App: React.FC = () => {
                          data-aos-duration="600">
                         <button
                             onClick={handleBookNow}
-                            className=" bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105"
+                            className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105 active:scale-95"
                         >
                             <Calendar className="inline-block mr-2" size={isMobile ? 16 : 20}/>
                             Check Availability & Book
                         </button>
                         <button
-                            className=" bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105"
+                            className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105 active:scale-95"
                             onClick={openWhatsApp}
                         >
                             Contact Now
@@ -375,7 +388,7 @@ const App: React.FC = () => {
                     data-aos="fade-up">About Villa Safira</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
                     <img src="./dhome7.jpg" alt="Villa Exterior"
-                         className="rounded-xl sm:rounded-2xl shadow-lg w-full h-auto"
+                         className="rounded-xl sm:rounded-2xl shadow-lg w-full h-auto object-cover"
                          data-aos="fade-right"/>
                     <p className="text-sm sm:text-base md:text-lg leading-relaxed text-amber-900"
                        data-aos="fade-left">
@@ -509,7 +522,7 @@ const App: React.FC = () => {
                         <div className="text-center" data-aos="fade-up">
                             <button
                                 onClick={handleBookNow}
-                                className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-6 py-4 rounded-full text-lg font-semibold shadow-lg transition-transform hover:scale-105 w-full max-w-xs"
+                                className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-6 py-4 rounded-full text-lg font-semibold shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-xs"
                             >
                                 <Calendar className="inline-block mr-2" size={24}/>
                                 Check Availability & Book
@@ -594,7 +607,7 @@ const App: React.FC = () => {
                     </div>
 
                     <button onClick={handleAddReview}
-                            className="bg-amber-700 hover:bg-amber-800 text-amber-50 w-full py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition">
+                            className="bg-amber-700 hover:bg-amber-800 text-amber-50 w-full py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition active:scale-95">
                         Submit Review
                     </button>
                 </div>
@@ -622,7 +635,7 @@ const App: React.FC = () => {
                                         aria-label={`Jump to ${sec} section`}
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            scrollToSection(sec, false); // Notice the false here
+                                            scrollToSection(sec, false);
                                         }}
                                     >
                                         {sec.charAt(0).toUpperCase() + sec.slice(1)}
