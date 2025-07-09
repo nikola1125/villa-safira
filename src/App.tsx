@@ -208,6 +208,20 @@ const App: React.FC = () => {
             )}
         </div>
     );
+    const [menuAnimation, setMenuAnimation] = useState<'opening' | 'open' | 'closing' | 'closed'>('closed');
+    const toggleMenu = () => {
+        if (!isMenuOpen) {
+            setIsMenuOpen(true);
+            setMenuAnimation('opening');
+            setTimeout(() => setMenuAnimation('open'), 50); // Short delay to allow CSS transition
+        } else {
+            setMenuAnimation('closing');
+            setTimeout(() => {
+                setIsMenuOpen(false);
+                setMenuAnimation('closed');
+            }, 300); // Match this with your CSS transition duration
+        }
+    };
 
     return (
         <div className="font-poppins bg-amber-50 text-amber-900 min-h-screen">
@@ -219,7 +233,7 @@ const App: React.FC = () => {
                         Villa Safira
                     </div>
 
-                    <button className="sm:hidden text-amber-900" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <button className="sm:hidden text-amber-900" onClick={toggleMenu}>
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isMenuOpen ? (
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -250,17 +264,38 @@ const App: React.FC = () => {
                 </div>
 
                 {isMenuOpen && (
-                    <div className="sm:hidden bg-amber-100 py-2 px-4">
-                        {["about", "gallery", "facilities", "reviews", "contact"].map(sec => (
-                            <div key={sec} className="py-3 border-b border-amber-200/50">
-                                <span className="cursor-pointer hover:text-amber-700 transition block"
-                                      onClick={() => scrollToSection(sec === "contact" ? "" : sec)}>
-                                    {sec.charAt(0).toUpperCase() + sec.slice(1)}
-                                </span>
+                    <div
+                        className={`sm:hidden bg-amber-100 py-2 px-4 overflow-hidden transition-all duration-300 ease-in-out ${
+                            menuAnimation === 'opening' ? 'max-h-0 opacity-0' :
+                                menuAnimation === 'open' ? 'max-h-screen opacity-100' :
+                                    menuAnimation === 'closing' ? 'max-h-0 opacity-0' :
+                                        'max-h-0 opacity-0'
+                        }`}>
+                        {["about", "gallery", "facilities", "reviews", "contact"].map((sec) => (
+                            <div
+                                key={sec}
+                                className={`py-3 border-b border-amber-200/50 transition-all duration-300 ${
+                                    menuAnimation === 'opening' ? 'opacity-0 translate-y-2' :
+                                        menuAnimation === 'open' ? 'opacity-100 translate-y-0' :
+                                            menuAnimation === 'closing' ? 'opacity-0 -translate-y-2' :
+                                                'opacity-0'
+                                }`}
+                                style={{transitionDelay: menuAnimation === 'opening' ? `${0.1 * ["about", "gallery", "facilities", "reviews", "contact"].indexOf(sec)}s` : '0s'}}
+                            >
+        <span
+            className="cursor-pointer hover:text-amber-700 transition block"
+            onClick={() => {
+                scrollToSection(sec === "contact" ? "" : sec);
+                toggleMenu();
+            }}
+        >
+          {sec.charAt(0).toUpperCase() + sec.slice(1)}
+        </span>
                             </div>
                         ))}
                     </div>
                 )}
+
             </nav>
 
             {/* Hero Section */}
