@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.parallax-bg {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
 @layer utilities {
     .booked-date {
         background-color: #fecaca !important; /* red-100 */
@@ -77,6 +82,7 @@ body {
         background-size: cover !important;
     }
 }
+
 @supports (-webkit-touch-callout: none) {
     .your-background-class {
         -webkit-background-attachment: scroll;

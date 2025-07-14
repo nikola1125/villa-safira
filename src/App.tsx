@@ -10,12 +10,12 @@ import {
     Bath,
     Bed,
     Calendar,
-    Car, Check,
+    Car,
+    Check,
     ChevronLeft,
     ChevronRight,
     Clock,
     Coffee,
-    Mail,
     MapPin,
     Shield,
     Star,
@@ -73,14 +73,41 @@ const App: React.FC = () => {
         comment: "",
         rating: 5
     });
+    const [backgroundOffset, setBackgroundOffset] = useState(0);
     const [reviews, setReviews] = useState<Review[]>(
         () => JSON.parse(localStorage.getItem("reviews") || "[]")
     );
+    useEffect(() => {
+        const onScroll = () => {
+            const scrollY = window.scrollY;
+            setScrollY(scrollY);
+
+            // Calculate background offset based on scroll position
+            const aboutSection = document.getElementById('about');
+            if (aboutSection) {
+                const aboutRect = aboutSection.getBoundingClientRect();
+                const offset = Math.min(Math.max(aboutRect.top / window.innerHeight * 100, 0), -30);
+                setBackgroundOffset(offset);
+            }
+        };
+
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
     const [lightboxState, setLightboxState] = useState({
         open: false,
         index: 0,
         images: [] as string[]
     });
+    useEffect(() => {
+        // Add this effect for mobile zoom prevention
+        const preventZoom = (e: TouchEvent) => {
+            if (e.touches.length > 1) e.preventDefault();
+        };
+
+        document.addEventListener('touchmove', preventZoom, {passive: false});
+        return () => document.removeEventListener('touchmove', preventZoom);
+    }, []);
 
     const countryOptions = countryList().getData();
 
@@ -100,7 +127,7 @@ const App: React.FC = () => {
 
     const openWhatsApp = () => {
         const phoneNumber = '+355692429567';
-        const message = 'Hello, I have a question about Villa Safira';
+        const message = 'Hello, I have a question about Villa Safira.';
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
     };
@@ -193,10 +220,10 @@ const App: React.FC = () => {
             title: "Bedrooms",
             coverImage: "./dhome3.jpg",
             images: [
-                "./dhome3.jpg", "./dhome0.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome.jpg",
-                "./dhome4.jpg", "./dhome6.jpg", "./dhome8.jpg",
+                "./dhome3.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome.jpg",
+                "./dhome4.jpg", "./dhome5.jpg", "./dhome6.jpg", "./dhome8.jpg",
                 "./dhome10.jpg", "./dhome11.jpg", "./dhome12.jpg", "./dhome13.jpg",
-                "./dhome14.jpg", "./dhome15.jpg", "./dhome22.jpg", "./dhome70.jpg", "./dhome71.jpg"
+                "./dhome14.jpg", "./dhome72.jpg", "./dhome15.jpg", "./dhome70.jpg", "./dhome71.jpg"
             ]
         },
         {
@@ -244,7 +271,8 @@ const App: React.FC = () => {
     return (
         <div className="font-poppins bg-amber-50 text-amber-900 min-h-screen">
             {/* Add viewport meta tag in React */}
-            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover"/>
 
             {/* Navbar */}
             <nav className="fixed w-full bg-amber-100/90 shadow-md backdrop-blur-sm z-50 border-b border-amber-200">
@@ -328,51 +356,59 @@ const App: React.FC = () => {
             </nav>
 
             {/* Hero Section */}
-            <section id="hero"
-                     className="relative h-screen flex justify-center items-center pt-16 sm:pt-20 overflow-hidden">
-                {[0, 1].map(idx => (
-                    <div key={idx}
-                         className="absolute inset-0 bg-fixed bg-center transition-opacity duration-1000 ease-in-out"
-                         style={{
-                             backgroundImage: `url(${idx === 0
-                                 ? (scrollY < window.innerHeight ? "/jasht3.jpg" : "/dhome7.jpg")
-                                 : (scrollY >= window.innerHeight ? "/dhome7.jpg" : "/jasht3.jpg")
-                             })`,
-                             opacity: idx === 0
-                                 ? (scrollY < window.innerHeight ? 1 : 0)
-                                 : (scrollY >= window.innerHeight ? 1 : 0),
-                             backgroundSize: "cover",
-                             backgroundPosition: "center 30%",
-                         }}/>
-                ))}
-                <div className="absolute inset-0 bg-amber-900/40"/>
+            {/* Hero Section */}
+            <section
+                id="hero"
+                className="relative h-screen flex justify-center items-center pt-16 overflow-hidden"
+            >
+                {/* Enhanced Parallax Background */}
                 <div
-                    className="relative z-10 text-center text-amber-50 px-4 sm:px-6 max-w-xs sm:max-w-md md:max-w-3xl">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mb-4 sm:mb-6 font-extrabold"
-                        data-aos="fade-up"
-                        data-aos-duration="1000">
+                    className="absolute inset-0 bg-cover bg-center will-change-transform"
+                    style={{
+                        backgroundImage: "url('/jasht3.jpg')",
+                        backgroundPosition: "center 30%",
+                        transform: `translateY(${scrollY * 0.3}px)`, // Slower movement (30% of scroll speed)
+                        transition: "transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1)", // Smoother easing
+                        scale: `${1 + scrollY * 0.0005}` // Subtle zoom-out effect
+                    }}
+                />
+                <div
+                    className="absolute inset-0 bg-amber-900/40"
+                    style={{
+                        opacity: `${1 - scrollY * 0.002}` // Gradual fade
+                    }}
+                />
+
+                {/* Content (keeps your existing animations) */}
+                <div className="relative z-10 text-center px-4">
+                    <h1
+                        className="text-4xl sm:text-5xl font-extrabold text-amber-50 mb-4"
+                        data-aos="fade-up" // Your existing AOS animation
+                    >
                         Villa Safira
                     </h1>
-                    <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 font-medium"
-                       data-aos="fade-up"
-                       data-aos-delay="800"
-                       data-aos-duration="800">
+                    <p
+                        className="text-lg sm:text-xl text-amber-50 mb-6"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
                         Your cozy corner of the coast
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center"
-                         data-aos="fade-up"
-                         data-aos-delay="1200"
-                         data-aos-duration="600">
+                    <div
+                        className="flex flex-col sm:flex-row gap-3 justify-center"
+                        data-aos="fade-up"
+                        data-aos-delay="400"
+                    >
                         <button
                             onClick={handleBookNow}
-                            className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105 active:scale-95"
+                            className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 rounded-full font-semibold transition-all"
                         >
-                            <Calendar className="inline-block mr-2" size={isMobile ? 16 : 20}/>
+                            <Calendar className="inline mr-2" size={16}/>
                             Check Availability & Book
                         </button>
                         <button
-                            className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-semibold transition-transform hover:scale-105 active:scale-95"
                             onClick={openWhatsApp}
+                            className="bg-transparent border-2 border-amber-50 hover:bg-amber-50 hover:text-amber-900 text-amber-50 px-4 py-2 rounded-full font-semibold transition-all"
                         >
                             Contact Now
                         </button>
@@ -380,29 +416,32 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/* About Section */}
+            {/* About Section */
+            }
             <section id="about"
-                     className="py-12 sm:py-16 md:py-20 bg-amber-50 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 border border-amber-100"
-                     data-aos="fade-up">
+                     className="py-12 sm:py-16 md:py-20 bg-amber-50 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 border border-amber-100">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 text-amber-900"
                     data-aos="fade-up">About Villa Safira</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
-                    <img src="./dhome7.jpg" alt="Villa Exterior"
-                         className="rounded-xl sm:rounded-2xl shadow-lg w-full h-auto object-cover"
-                         data-aos="fade-right"/>
-                    <p className="text-sm sm:text-base md:text-lg leading-relaxed text-amber-900"
-                       data-aos="fade-left">
-                        Welcome to Villa Safira, a charming 4-floor B&B just a short walk from the sea in Durrës!
-                        We offer 4 stylish rooms (3 with private balconies and garden view, 1 with garden view
-                        only), each with cozy decor and all the comforts you need. Breakfast is included, and
-                        guests can enjoy a shared kitchen if desired. Whether you're a couple, family, or business
-                        traveler, Villa Safira is your peaceful retreat near the beach. Fast Wi-Fi, garden access,
-                        and warm hospitality await!
-                    </p>
+                    <div data-aos="fade-right">
+                        <img src="./dhome7.jpg" alt="Villa Exterior"
+                             className="rounded-xl sm:rounded-2xl shadow-lg w-full h-auto"/>
+                    </div>
+                    <div data-aos="fade-left">
+                        <p className="text-sm sm:text-base md:text-lg leading-relaxed text-amber-900">
+                            Welcome to Villa Safira, a charming 4-floor B&B just a short walk from the sea in Durrës!
+                            We offer 4 stylish rooms (3 with private balconies and garden view, 1 with garden view
+                            only), each with cozy decor and all the comforts you need. Breakfast is included, and
+                            guests can enjoy a shared kitchen if desired. Whether you're a couple, family, or business
+                            traveler, Villa Safira is your peaceful retreat near the beach. Fast Wi-Fi, garden access,
+                            and warm hospitality await!
+                        </p>
+                    </div>
                 </div>
             </section>
 
-            {/* Facilities Section */}
+            {/* Facilities Section */
+            }
             <section id="facilities"
                      className="py-12 sm:py-16 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 md:mb-16 text-amber-900"
@@ -436,14 +475,246 @@ const App: React.FC = () => {
                 </div>
             </section>
 
+            {/* Gallery Section */
+            }
             {/* Gallery Section */}
+            {/*<section id="gallery"*/}
+            {/*         className="py-12 sm:py-16 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"*/}
+            {/*         data-aos="fade-up">*/}
+            {/*    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 md:mb-16 text-amber-900">Explore*/}
+            {/*        Our Spaces</h2>*/}
+
+            {/*    /!* Room Types - Desktop: 2x2 grid, Mobile: 1 column *!/*/}
+            {/*    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 md:mb-12">*/}
+            {/*        {[*/}
+            {/*            {*/}
+            {/*                id: "deluxe-double",*/}
+            {/*                title: "Deluxe Double Room",*/}
+            {/*                coverImage: "./dhome.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome.jpg",*/}
+            {/*                    "./dhome11.jpg",*/}
+            {/*                    "./dhome9.jpg",*/}
+            {/*                    "./dhome16.jpg",*/}
+            {/*                    "./dhome1.jpg",*/}
+            {/*                    "./banjo6.jpg",*/}
+            {/*                    "./banjo8.jpg",*/}
+            {/*                    "./jasht9.jpg",*/}
+            {/*                    "./kuzhin77.jpg",*/}
+
+            {/*                ]*/}
+            {/*            },*/}
+            {/*            {*/}
+            {/*                id: "deluxe-double-balcony",*/}
+            {/*                title: "Deluxe Double Room with Balcony",*/}
+            {/*                coverImage: "./dhome4.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome4.jpg",*/}
+            {/*                    "./dhome17.jpg",*/}
+            {/*                    "./dhome5.jpg",*/}
+            {/*                    "./dhome24.jpg",*/}
+            {/*                    "./dhome6.jpg",*/}
+            {/*                    "./banjo7.jpg",*/}
+            {/*                    "./banjo1.jpg",*/}
+            {/*                    "./banjo3.jpg",*/}
+            {/*                    "./dhome13.jpg",*/}
+            {/*                    "./dhome20.jpg",*/}
+            {/*                    "./kuzhin79.jpg",*/}
+
+            {/*                ]*/}
+            {/*            },*/}
+            {/*            {*/}
+            {/*                id: "triple-garden",*/}
+            {/*                title: "Triple Room with Garden View",*/}
+            {/*                coverImage: "./dhome3.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome3.jpg",*/}
+            {/*                    "./dhome21.jpg",*/}
+            {/*                    "./dhome22.jpg",*/}
+            {/*                    "./dhome23.jpg",*/}
+            {/*                    "./dhome8.jpg",*/}
+            {/*                    "./banjo2.jpg",*/}
+            {/*                    "./dhome25.jpg",*/}
+            {/*                    "./jasht2.jpg",*/}
+            {/*                    "./kuzhin2.jpg",*/}
+
+            {/*                ]*/}
+            {/*            },*/}
+            {/*            {*/}
+            {/*                id: "family-suite",*/}
+            {/*                title: "Deluxe Family Suite",*/}
+            {/*                coverImage: "./dhome10.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome10.jpg",*/}
+            {/*                    "./dhome71.jpg",*/}
+            {/*                    "./dhome73.jpg",*/}
+            {/*                    "./dhome75.jpg",*/}
+            {/*                    "./dhome74.jpg",*/}
+            {/*                    "./dhome12.jpg",*/}
+            {/*                    "./dhome15.jpg",*/}
+            {/*                    "./dhome76.jpg",*/}
+            {/*                    "./banjo5.jpg",*/}
+            {/*                    "./banjo8.jpg",*/}
+            {/*                    "./banjo9.jpg",*/}
+            {/*                    "./kuzhin.jpg",*/}
+
+
+            {/*                ]*/}
+            {/*            }*/}
+            {/*        ].map((g, i) => (*/}
+            {/*            <div*/}
+            {/*                key={g.id}*/}
+            {/*                className="relative group cursor-pointer rounded-lg sm:rounded-xl overflow-hidden shadow-md h-48 sm:h-64 md:h-80"*/}
+            {/*                onClick={() => {*/}
+            {/*                    setLightboxState({*/}
+            {/*                        open: true,*/}
+            {/*                        index: 0,*/}
+            {/*                        images: g.images*/}
+            {/*                    });*/}
+            {/*                }}*/}
+            {/*                data-aos="fade-up"*/}
+            {/*                data-aos-delay={i * 100}*/}
+            {/*            >*/}
+            {/*                <div*/}
+            {/*                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"*/}
+            {/*                    style={{backgroundImage: `url(${g.coverImage})`}}*/}
+            {/*                />*/}
+            {/*                <div*/}
+            {/*                    className="absolute inset-0 bg-amber-900/40 group-hover:bg-amber-900/60 transition-opacity duration-300"/>*/}
+            {/*                <div className="absolute inset-0 flex items-center justify-center z-10">*/}
+            {/*                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-50 drop-shadow-lg">{g.title}</h3>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        ))}*/}
+            {/*    </div>*/}
+
+            {/*    /!* Outdoor Section - Full width in both desktop and mobile *!/*/}
+            {/*    <div*/}
+            {/*        className="relative group cursor-pointer rounded-lg sm:rounded-xl overflow-hidden shadow-md h-48 sm:h-64 md:h-80 w-full"*/}
+            {/*        onClick={() => {*/}
+            {/*            setLightboxState({*/}
+            {/*                open: true,*/}
+            {/*                index: 0,*/}
+            {/*                images: [*/}
+            {/*                    "./jasht1.jpg",*/}
+            {/*                    "./jasht3.jpg",*/}
+            {/*                    "./jasht4.jpg",*/}
+            {/*                    "./jasht5.jpg",*/}
+            {/*                    "./jasht6.jpg",*/}
+            {/*                    "./jasht7.jpg",*/}
+            {/*                    "./jasht8.jpg"*/}
+            {/*                ]*/}
+            {/*            });*/}
+            {/*        }}*/}
+            {/*        data-aos="fade-up"*/}
+            {/*    >*/}
+            {/*        <div*/}
+            {/*            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"*/}
+            {/*            style={{backgroundImage: "url('./jasht1.jpg')"}}*/}
+            {/*        />*/}
+            {/*        <div*/}
+            {/*            className="absolute inset-0 bg-amber-900/40 group-hover:bg-amber-900/60 transition-opacity duration-300"/>*/}
+            {/*        <div className="absolute inset-0 flex items-center justify-center z-10">*/}
+            {/*            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-50 drop-shadow-lg">Outdoor*/}
+            {/*                Spaces</h3>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+
+            {/*    <Lightbox*/}
+            {/*        open={lightboxState.open}*/}
+            {/*        close={() => setLightboxState({...lightboxState, open: false})}*/}
+            {/*        index={lightboxState.index}*/}
+            {/*        slides={lightboxState.images.map(img => ({src: img}))}*/}
+            {/*        controller={{*/}
+            {/*            closeOnBackdropClick: true,*/}
+            {/*            closeOnPullDown: true,*/}
+            {/*        }}*/}
+            {/*        render={{*/}
+            {/*            iconPrev: () => <ChevronLeft size={isMobile ? 32 : 48} className="text-amber-700"/>,*/}
+            {/*            iconNext: () => <ChevronRight size={isMobile ? 32 : 48} className="text-amber-700"/>,*/}
+            {/*            iconClose: () => <X size={isMobile ? 24 : 32} className="text-amber-700"/>,*/}
+            {/*        }}*/}
+            {/*    />*/}
+            {/*</section>*/}
             <section id="gallery"
                      className="py-12 sm:py-16 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"
                      data-aos="fade-up">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 md:mb-16 text-amber-900">Explore
                     Our Spaces</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
-                    {galleryData.map((g, i) => (
+
+                {/* Room Types - Desktop: 2x2 grid, Mobile: 1 column */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 md:mb-12">
+                    {[
+                        {
+                            id: "deluxe-double",
+                            title: "Deluxe Double Room",
+                            coverImage: "./dhome.jpg",
+                            images: [
+                                "./dhome.jpg",
+                                "./dhome11.jpg",
+                                "./dhome9.jpg",
+                                "./dhome16.jpg",
+                                "./dhome1.jpg",
+                                "./banjo6.jpg",
+                                "./banjo8.jpg",
+                                "./jasht9.jpg",
+                                "./kuzhin77.jpg",
+                            ]
+                        },
+                        {
+                            id: "deluxe-double-balcony",
+                            title: "Deluxe Double Room with Balcony",
+                            coverImage: "./dhome4.jpg",
+                            images: [
+                                "./dhome4.jpg",
+                                "./dhome17.jpg",
+                                "./dhome5.jpg",
+                                "./dhome24.jpg",
+                                "./dhome6.jpg",
+                                "./banjo7.jpg",
+                                "./banjo1.jpg",
+                                "./banjo3.jpg",
+                                "./dhome13.jpg",
+                                "./dhome20.jpg",
+                                "./kuzhin79.jpg",
+                            ]
+                        },
+                        {
+                            id: "triple-garden",
+                            title: "Triple Room with Garden View",
+                            coverImage: "./dhome3.jpg",
+                            images: [
+                                "./dhome3.jpg",
+                                "./dhome21.jpg",
+                                "./dhome22.jpg",
+                                "./dhome23.jpg",
+                                "./dhome8.jpg",
+                                "./banjo2.jpg",
+                                "./dhome25.jpg",
+                                "./jasht2.jpg",
+                                "./kuzhin2.jpg",
+                            ]
+                        },
+                        {
+                            id: "family-suite",
+                            title: "Deluxe Family Suite",
+                            coverImage: "./dhome10.jpg",
+                            images: [
+                                "./dhome10.jpg",
+                                "./dhome71.jpg",
+                                "./dhome73.jpg",
+                                "./dhome75.jpg",
+                                "./dhome74.jpg",
+                                "./dhome12.jpg",
+                                "./dhome15.jpg",
+                                "./dhome76.jpg",
+                                "./banjo5.jpg",
+                                "./banjo8.jpg",
+                                "./banjo9.jpg",
+                                "./kuzhin.jpg",
+                            ]
+                        }
+                    ].map((g, i) => (
                         <div
                             key={g.id}
                             className="relative group cursor-pointer rounded-lg sm:rounded-xl overflow-hidden shadow-md h-48 sm:h-64 md:h-80"
@@ -459,7 +730,11 @@ const App: React.FC = () => {
                         >
                             <div
                                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                                style={{backgroundImage: `url(${g.coverImage})`}}
+                                style={{
+                                    backgroundImage: `url(${g.coverImage})`,
+                                    // Adjust background position only for Deluxe Double Room
+                                    backgroundPosition: g.id === "deluxe-double" ? "center 65%" : "center center"
+                                }}
                             />
                             <div
                                 className="absolute inset-0 bg-amber-900/40 group-hover:bg-amber-900/60 transition-opacity duration-300"/>
@@ -468,6 +743,38 @@ const App: React.FC = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Outdoor Section - Full width in both desktop and mobile */}
+                <div
+                    className="relative group cursor-pointer rounded-lg sm:rounded-xl overflow-hidden shadow-md h-48 sm:h-64 md:h-80 w-full"
+                    onClick={() => {
+                        setLightboxState({
+                            open: true,
+                            index: 0,
+                            images: [
+                                "./jasht1.jpg",
+                                "./jasht3.jpg",
+                                "./jasht4.jpg",
+                                "./jasht5.jpg",
+                                "./jasht6.jpg",
+                                "./jasht7.jpg",
+                                "./jasht8.jpg"
+                            ]
+                        });
+                    }}
+                    data-aos="fade-up"
+                >
+                    <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                        style={{backgroundImage: "url('./jasht1.jpg')"}}
+                    />
+                    <div
+                        className="absolute inset-0 bg-amber-900/40 group-hover:bg-amber-900/60 transition-opacity duration-300"/>
+                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-50 drop-shadow-lg">Outdoor
+                            Spaces</h3>
+                    </div>
                 </div>
 
                 <Lightbox
@@ -487,52 +794,8 @@ const App: React.FC = () => {
                 />
             </section>
 
-            {/* Booking Section */}
-            <section id="booking" className="py-12 sm:py-16 max-w-6xl mx-auto px-4 sm:px-6">
-                <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-amber-900">
-                    Book Your Stay
-                </h2>
-
-                <div className="bg-amber-100 rounded-xl p-6 sm:p-8 shadow-md" data-aos="fade-up">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h3 className="text-xl sm:text-2xl font-bold text-amber-900 mb-4">
-                                Ready to experience Villa Safira?
-                            </h3>
-                            <p className="text-amber-900 mb-6">
-                                Check availability for your preferred dates and book directly with us.
-                                We offer secure payments through Paysera.
-                            </p>
-                            <ul className="space-y-3 text-amber-900">
-                                <li className="flex items-start gap-2">
-                                    <Check className="text-amber-700 mt-1 flex-shrink-0" size={18}/>
-                                    <span>Best price guarantee</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Check className="text-amber-700 mt-1 flex-shrink-0" size={18}/>
-                                    <span>No booking fees</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Check className="text-amber-700 mt-1 flex-shrink-0" size={18}/>
-                                    <span>Secure payment processing</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="text-center" data-aos="fade-up">
-                            <button
-                                onClick={handleBookNow}
-                                className="bg-amber-700 hover:bg-amber-800 text-amber-50 px-6 py-4 rounded-full text-lg font-semibold shadow-lg transition-transform hover:scale-105 active:scale-95 w-full max-w-xs"
-                            >
-                                <Calendar className="inline-block mr-2" size={24}/>
-                                Check Availability & Book
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Review Section */}
+            {/* Review Section */
+            }
             <section id="reviews"
                      className="py-12 sm:py-16 md:py-20 max-w-4xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"
                      data-aos="fade-up">
@@ -613,7 +876,8 @@ const App: React.FC = () => {
                 </div>
             </section>
 
-            {/* Footer */}
+            {/* Footer */
+            }
             <footer className="bg-amber-900 text-amber-50 py-8 sm:py-12 backdrop-blur-sm border-t border-amber-200">
                 <div
                     className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between gap-6 sm:gap-8 md:gap-0">
@@ -625,7 +889,7 @@ const App: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="md:w-1/3 md:text-center md:ml-8">
+                    <div className="md:mx-auto md:w-auto">
                         <h4 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4">Quick Links</h4>
                         <ul className="space-y-1 sm:space-y-2">
                             {["about", "gallery", "facilities", "reviews"].map(sec => (
@@ -666,7 +930,7 @@ const App: React.FC = () => {
                             📞{' '}
                             {isMobile ? (
                                 <a
-                                    href={`https://wa.me/+355692429567`}
+                                    onClick={openWhatsApp}
                                     className="underline hover:text-amber-700"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -685,7 +949,8 @@ const App: React.FC = () => {
                 </div>
             </footer>
         </div>
-    );
+    )
+        ;
 };
 
 export default App;
