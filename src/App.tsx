@@ -11,7 +11,6 @@ import {
     Bed,
     Calendar,
     Car,
-    Check,
     ChevronLeft,
     ChevronRight,
     Clock,
@@ -74,25 +73,44 @@ const App: React.FC = () => {
         rating: 5
     });
     const [backgroundOffset, setBackgroundOffset] = useState(0);
-    const [reviews, setReviews] = useState<Review[]>(
-        () => JSON.parse(localStorage.getItem("reviews") || "[]")
-    );
-    useEffect(() => {
-        const onScroll = () => {
-            const scrollY = window.scrollY;
-            setScrollY(scrollY);
+    // const [reviews, setReviews] = useState<Review[]>(
+    //     () => JSON.parse(localStorage.getItem("reviews") || "[]")
+    // );
 
-            // Calculate background offset based on scroll position
-            const aboutSection = document.getElementById('about');
-            if (aboutSection) {
-                const aboutRect = aboutSection.getBoundingClientRect();
-                const offset = Math.min(Math.max(aboutRect.top / window.innerHeight * 100, 0), -30);
-                setBackgroundOffset(offset);
+    // useEffect(() => {
+    //     const onScroll = () => {
+    //         const scrollY = window.scrollY;
+    //         setScrollY(scrollY);
+    //
+    //         // Calculate background offset based on scroll position
+    //         const aboutSection = document.getElementById('about');
+    //         if (aboutSection) {
+    //             const aboutRect = aboutSection.getBoundingClientRect();
+    //             const offset = Math.min(Math.max(aboutRect.top / window.innerHeight * 100, 0), -30);
+    //             setBackgroundOffset(offset);
+    //         }
+    //     };
+    //
+    //     window.addEventListener("scroll", onScroll);
+    //     return () => window.removeEventListener("scroll", onScroll);
+    // }, []);
+    const [reviews, setReviews] = useState<Review[]>([]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const response = await apiClient.get('/api/reviews');
+                setReviews(response.data);
+                // Only update localStorage with fresh API data
+                localStorage.setItem("reviews", JSON.stringify(response.data));
+            } catch (err) {
+                console.error('Error fetching reviews:', err);
+                // Only use localStorage as fallback if API fails
+                const localReviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+                setReviews(localReviews);
             }
         };
-
-        window.addEventListener("scroll", onScroll);
-        return () => window.removeEventListener("scroll", onScroll);
+        fetchReviews();
     }, []);
     const [lightboxState, setLightboxState] = useState({
         open: false,
@@ -196,9 +214,10 @@ const App: React.FC = () => {
                     rating: newReview.rating
                 });
 
-                setReviews(prev => [response.data, ...prev]);
-                const updatedReviews = [response.data, ...reviews];
-                localStorage.setItem("reviews", JSON.stringify(updatedReviews));
+                const freshResponse = await apiClient.get('/api/reviews');
+                setReviews(freshResponse.data);
+                localStorage.setItem("reviews", JSON.stringify(freshResponse.data));
+
                 setNewReview({name: "", country: "", comment: "", rating: 5});
             } catch (err) {
                 console.error('Error saving to MongoDB, using localStorage instead:', err);
