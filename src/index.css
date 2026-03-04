@@ -2,17 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+.parallax-bg {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
 @layer utilities {
     .booked-date {
-        background-color: #fecaca !important; /* red-100 */
-        color: #b91c1c !important; /* red-700 */
+        background-color: #fecaca !important;
+        /* red-100 */
+        color: #b91c1c !important;
+        /* red-700 */
         pointer-events: none;
         opacity: 0.7;
     }
 
     .disabled-date {
         pointer-events: none;
-        color: #9ca3af; /* gray-400 */
+        color: #9ca3af;
+        /* gray-400 */
         opacity: 0.5;
     }
 
@@ -30,6 +38,33 @@
     .animation-delay-600 {
         animation-delay: 0.6s;
     }
+
+    /* Premium Glassmorphism Utilities */
+    .glass-panel {
+        @apply bg-white/70 backdrop-blur-xl border border-white/40;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .glass-panel-dark {
+        @apply bg-black/40 backdrop-blur-xl border border-white/10;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .luxury-heading {
+        @apply font-serif tracking-tight text-amber-950;
+    }
+
+    .css-hide-scrollbar {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .css-hide-scrollbar::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
 }
 
 @keyframes fadeInUp {
@@ -39,26 +74,32 @@
     }
 }
 
-html {
-    scroll-behavior: smooth;
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 body {
-
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    @apply font-sans antialiased;
+    background-color: #F9F6F1;
+    color: #1C1613;
 }
 
-.fc { /* FullCalendar container */
-    font-family: 'Poppins', sans-serif;
+.fc {
+    /* FullCalendar container */
+    @apply font-sans;
 }
 
 .fc-button {
-    background-color: #b45309 !important; /* Amber-700 */
+    background-color: #b45309 !important;
+    /* Amber-700 */
     border-color: #b45309 !important;
 }
 
 .fc-daygrid-day.fc-day-today {
-    background-color: #fef3c7 !important; /* Amber-100 */
+    background-color: #fef3c7 !important;
+    /* Amber-100 */
 }
 
 .fc-daygrid-day:hover {
@@ -66,6 +107,7 @@ body {
 }
 
 @supports (-webkit-touch-callout: none) {
+
     /* Safari-specific styles */
     .bg-fixed {
         -webkit-background-attachment: scroll !important;
@@ -77,6 +119,7 @@ body {
         background-size: cover !important;
     }
 }
+
 @supports (-webkit-touch-callout: none) {
     .your-background-class {
         -webkit-background-attachment: scroll;
