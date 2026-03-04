@@ -3,9 +3,27 @@ import Select from "react-select";
 // @ts-ignore
 import countryList from "react-select-country-list";
 import {
-    Bath, Bed, Calendar, Car, Clock, Coffee,
-    MapPin, Phone, Shield, Star, StarOff, Sun,
-    TreePine, Users, Utensils, Wifi, X, ChevronDown, Mail
+    Bath,
+    Bed,
+    Calendar,
+    Car,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Coffee,
+    MapPin,
+    Shield,
+    Star,
+    StarOff,
+    Sun,
+    TreePine,
+    Users,
+    Utensils,
+    Wifi,
+    X,
+    ChevronDown,
+    Mail,
+    Phone
 } from "lucide-react";
 import BounceCards from './BounceCards';
 import Stack from './Stack';
@@ -80,9 +98,15 @@ const App: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [newReview, setNewReview] = useState({
+        name: "",
+        country: "",
+        comment: "",
+        rating: 5
+    });
+    const [backgroundOffset, setBackgroundOffset] = useState(0);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [lightboxState, setLightboxState] = useState({ open: false, index: 0, images: [] as string[] });
-    const [reviews, setReviews] = useState<Review[]>(() => JSON.parse(localStorage.getItem("reviews") || "[]"));
-    const [newReview, setNewReview] = useState({ name: "", country: "", comment: "", rating: 5 });
 
     const { scrollY } = useScroll();
     const heroY = useTransform(scrollY, [0, 900], [0, 380]);
@@ -92,50 +116,99 @@ const App: React.FC = () => {
     useMotionValueEvent(scrollY, "change", v => setIsScrolled(v > 60));
 
     useEffect(() => {
-        const preventZoom = (e: TouchEvent) => { if (e.touches.length > 1) e.preventDefault(); };
-        document.addEventListener("touchmove", preventZoom, { passive: false });
-        const onResize = () => setIsMobile(window.innerWidth < 768);
-        onResize();
-        window.addEventListener("resize", onResize);
-        return () => {
-            document.removeEventListener("touchmove", preventZoom);
-            window.removeEventListener("resize", onResize);
-        };
-    }, []);
-
-    useEffect(() => {
-        (async () => {
+        const fetchReviews = async () => {
             try {
-                const r = await apiClient.get("/api/reviews");
-                setReviews(r.data);
-            } catch {
-                setReviews(JSON.parse(localStorage.getItem("reviews") || "[]"));
+                const response = await apiClient.get('/api/reviews');
+                setReviews(response.data);
+                localStorage.setItem("reviews", JSON.stringify(response.data));
+            } catch (err) {
+                console.error('Error fetching reviews:', err);
+                const localReviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+                setReviews(localReviews);
             }
-        })();
+        };
+        fetchReviews();
+    }, []);
+    useEffect(() => {
+        // Add this effect for mobile zoom prevention
+        const preventZoom = (e: TouchEvent) => {
+            if (e.touches.length > 1) e.preventDefault();
+        };
+
+        document.addEventListener('touchmove', preventZoom, { passive: false });
+        return () => document.removeEventListener('touchmove', preventZoom);
     }, []);
 
-    const openWhatsApp = () => window.open(`https://wa.me/+355692429567?text=${encodeURIComponent("Hello, I have a question about Villa Safira.")}`, "_blank");
+    const countryOptions = countryList().getData();
+
+    const handleAddReview = async () => {
+        if (newReview.name && newReview.country && newReview.comment && newReview.rating) {
+            try {
+                await apiClient.post('/api/reviews', {
+                    name: newReview.name,
+                    country: newReview.country,
+                    comment: newReview.comment,
+                    rating: newReview.rating
+                });
+                const freshResponse = await apiClient.get('/api/reviews');
+                setReviews(freshResponse.data);
+                localStorage.setItem("reviews", JSON.stringify(freshResponse.data));
+                setNewReview({ name: "", country: "", comment: "", rating: 5 });
+            } catch (err) {
+                console.error('Error saving to MongoDB, using localStorage instead:', err);
+                const reviewToSave = { ...newReview, date: new Date().toLocaleDateString() };
+                const updatedReviews = [reviewToSave, ...reviews];
+                setReviews(updatedReviews);
+                localStorage.setItem("reviews", JSON.stringify(updatedReviews));
+                setNewReview({ name: "", country: "", comment: "", rating: 5 });
+            }
+        }
+    };
+
+    const galleryData: GalleryItem[] = [
+        {
+            id: "bedrooms",
+            title: "Bedrooms",
+            coverImage: "./dhome3.jpg",
+            images: [
+                "./dhome3.jpg", "./dhome1.jpg", "./dhome2.jpg", "./dhome.jpg",
+                "./dhome4.jpg", "./dhome5.jpg", "./dhome6.jpg", "./dhome8.jpg",
+                "./dhome10.jpg", "./dhome11.jpg", "./dhome12.jpg", "./dhome13.jpg",
+                "./dhome14.jpg", "./dhome72.jpg", "./dhome15.jpg", "./dhome70.jpg", "./dhome71.jpg"
+            ]
+        },
+        {
+            id: "bathrooms",
+            title: "Bathrooms",
+            coverImage: "./banjo7.jpg",
+            images: ["./banjo7.jpg", "./banjo2.jpg", "./banjo5.jpg", "./banjo6.jpg", "./banjo1.jpg", "./banjo8.jpg"]
+        },
+        {
+            id: "kitchen",
+            title: "Kitchen",
+            coverImage: "./kuzhin77.jpg",
+            images: ["./kuzhin77.jpg", "./kuzhin.jpg", "./kuzhin78.jpg", "./kuzhin79.jpg", "./kuzhin2.jpg"]
+        },
+        {
+            id: "outdoor",
+            title: "Outdoor",
+            coverImage: "./jasht1.jpg",
+            images: ["./jasht1.jpg", "./jasht2.jpg", "./jasht3.jpg", "./jasht4.jpg", "./jasht5.jpg", "./jasht6.jpg", "./jasht7.jpg", "./jasht8.jpg"]
+        }
+    ];
+
+    const openWhatsApp = () => {
+        const phoneNumber = '+355692429567';
+        const message = 'Hello, I have a question about Villa Safira.';
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
     const handleBookNow = () => window.open("https://www.booking.com/hotel/al/villa-sol-durres.html", "_blank");
 
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
         setIsMenuOpen(false);
-    };
-
-    const handleAddReview = async () => {
-        if (!newReview.name || !newReview.country || !newReview.comment) return;
-        try {
-            const r = await apiClient.post("/api/reviews", newReview);
-            const updated = [r.data, ...reviews];
-            setReviews(updated);
-            localStorage.setItem("reviews", JSON.stringify(updated));
-        } catch {
-            const saved = { ...newReview, date: new Date().toLocaleDateString() };
-            const updated = [saved, ...reviews];
-            setReviews(updated);
-            localStorage.setItem("reviews", JSON.stringify(updated));
-        }
-        setNewReview({ name: "", country: "", comment: "", rating: 5 });
     };
 
     const renderStars = (rating: number) => (
@@ -151,10 +224,10 @@ const App: React.FC = () => {
     const NAV_LINKS = ["story", "rooms", "amenities", "gallery", "reviews"];
 
     return (
-        <div className="bg-[#F9F6F1] text-[#1C1613] font-sans selection:bg-amber-200 overflow-x-hidden w-full relative">
-
-            {/* ──────── VIEWPORT META ──────────────────────────────── */}
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <div className="font-poppins bg-amber-50 text-amber-900 min-h-screen">
+            {/* Add viewport meta tag in React */}
+            <meta name="viewport"
+                content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover" />
 
             {/* ══════════════════════════════════════════════════════
                 NAV — transparent on hero, opaque after scroll
@@ -300,7 +373,6 @@ const App: React.FC = () => {
                             Where the Adriatic breeze meets Albanian warmth
                         </motion.p>
                     </div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -470,133 +542,53 @@ const App: React.FC = () => {
             </section>
 
             {/* ══════════════════════════════════════════════════════
-                § 3 — ROOMS (light, editorial)
+                § 3 — THE SANCTUARY (Rooms)
             ══════════════════════════════════════════════════════ */}
             <section id="rooms" className="py-32 sm:py-48 bg-[#F9F6F1]">
                 <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                    <FadeUp className="mb-4">
-                        <p className="text-amber-700/60 text-xs tracking-[0.4em] uppercase">Chapter III</p>
+                    <FadeUp>
+                        <p className="text-[#1C1613]/40 text-xs tracking-[0.4em] uppercase mb-12">Chapter III — The Sanctuary</p>
                     </FadeUp>
-                    <MaskReveal className="mb-20 sm:mb-32">
-                        <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl font-light text-[#1C1613]">
-                            Your Room Awaits
-                        </h2>
-                    </MaskReveal>
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                        {[
-                            { img: "./dhome1.jpg", name: "Deluxe Double", desc: "A haven of calm with refined finishes, garden views, and everything you need to feel at home.", badge: "Most Popular" },
-                            { img: "./dhome5.jpg", name: "Double with Balcony", desc: "Step onto your private balcony each morning — sea breeze, coffee in hand, the day wide open.", badge: "Sea Breeze" },
-                            { img: "./dhome8.jpg", name: "Triple Garden View", desc: "Spacious comfort for small families or friends, surrounded by lush garden views.", badge: "Garden View" },
-                            { img: "./dhome11.jpg", name: "Family Suite", desc: "Generous space designed with families in mind — every detail considered, every comfort provided.", badge: "Family Retreat" },
-                            { img: "./jasht3.jpg", name: "Garden Terrace", desc: "Unwind in our lush garden with the gentle hum of cicadas and flickering afternoon light.", badge: "Outdoor Bliss" },
-                        ].map((room, i) => (
-                            <FadeUp key={i} delay={i * 0.08}>
-                                <motion.div
-                                    whileHover={{ y: -8 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-700 cursor-pointer"
-                                    onClick={() => {
-                                        if (i < GALLERY_DATA.length) {
-                                            setLightboxState({ open: true, index: i, images: GALLERY_DATA[i].images });
-                                        }
-                                    }}
-                                >
-                                    <div className="aspect-[4/3] overflow-hidden">
-                                        <motion.img
-                                            src={room.img}
-                                            alt={room.name}
-                                            className="w-full h-full object-cover"
-                                            whileHover={{ scale: 1.08 }}
-                                            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                                        />
-                                    </div>
-                                    <div className="absolute top-4 left-4">
-                                        <span className="text-xs tracking-widest uppercase bg-white/90 text-[#1C1613] font-semibold px-3 py-1 rounded-full">
-                                            {room.badge}
-                                        </span>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="font-serif text-xl text-[#1C1613] mb-2">{room.name}</h3>
-                                        <p className="text-stone-500 text-sm leading-relaxed mb-4">{room.desc}</p>
-                                        <div className="flex items-center gap-1 text-amber-500 text-xs font-semibold group-hover:text-amber-700 transition-colors">
-                                            <span className="tracking-widest uppercase">View Photos</span>
-                                            <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </FadeUp>
-                        ))}
-
-                        {/* Book CTA card */}
-                        <FadeUp delay={0.4}>
-                            <motion.div
-                                whileHover={{ y: -8 }}
-                                transition={{ duration: 0.5 }}
-                                className="group relative bg-[#1C1613] rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-700 flex flex-col justify-center items-center p-10 text-center min-h-[200px]"
-                            >
-                                <p className="text-amber-400/70 text-xs tracking-[0.3em] uppercase mb-4">Reserve Yours</p>
-                                <h3 className="font-serif text-white text-2xl mb-6">Start Planning<br />Your Stay</h3>
-                                <button
-                                    onClick={handleBookNow}
-                                    className="px-6 py-3 bg-white text-[#1C1613] text-xs tracking-widest uppercase font-bold rounded-full hover:bg-amber-50 transition-colors"
-                                >
-                                    Check Availability
-                                </button>
-                            </motion.div>
+                    <div className="mb-24">
+                        <MaskReveal>
+                            <h2 className="font-serif text-5xl sm:text-7xl lg:text-8xl font-light text-[#1C1613] leading-none mb-8">
+                                Private<br />
+                                <em className="text-amber-600 not-italic">Sanctuaries.</em>
+                            </h2>
+                        </MaskReveal>
+                        <FadeUp delay={0.2}>
+                            <p className="text-stone-500 text-lg sm:text-xl max-w-2xl font-light leading-relaxed">
+                                Four boutique rooms designed for deep rest. Each space is a blend of minimal coastal
+                                aesthetics and premium Albanian hospitality.
+                            </p>
                         </FadeUp>
                     </div>
-                </div>
-            </section>
 
-            {/* ══════════════════════════════════════════════════════
-                § 4 — FULL SCREEN STATEMENT BREAK
-            ══════════════════════════════════════════════════════ */}
-            <section className="relative h-[70vh] sm:h-screen overflow-hidden flex items-center justify-center">
-                <div className={`absolute inset-0 bg-cover bg-center ${!isMobile ? 'bg-fixed' : ''}`} style={{ backgroundImage: "url('/jasht2.jpg')" }} />
-                <div className="absolute inset-0 bg-[#130E0A]/60" />
-                <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-                    <MaskReveal>
-                        <p className="font-serif text-white text-3xl sm:text-5xl md:text-6xl font-light leading-relaxed">
-                            "Breakfast on the terrace.<br />
-                            <em className="text-amber-400">Salt air through the window.</em><br />
-                            No alarm. No rush."
-                        </p>
-                    </MaskReveal>
-                    <FadeUp delay={0.5} className="mt-10">
-                        <p className="text-white/50 text-sm tracking-[0.3em] uppercase">This is your life at Villa Safira</p>
-                    </FadeUp>
-                </div>
-            </section>
-
-            {/* ══════════════════════════════════════════════════════
-                § 5 — AMENITIES (dark, premium grid)
-            ══════════════════════════════════════════════════════ */}
-            <section id="amenities" className="bg-[#130E0A] text-white py-32 sm:py-48">
-                <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                    <FadeUp className="mb-4">
-                        <p className="text-amber-400/70 text-xs tracking-[0.4em] uppercase">Chapter IV — The Details</p>
-                    </FadeUp>
-                    <MaskReveal className="mb-20 sm:mb-32">
-                        <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl font-light">
-                            Every Comfort,<br />
-                            <em className="text-amber-400 not-italic">Considered.</em>
-                        </h2>
-                    </MaskReveal>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px bg-white/5 rounded-3xl overflow-hidden">
-                        {AMENITIES.map((a, i) => (
-                            <FadeUp key={i} delay={i * 0.04}>
-                                <motion.div
-                                    whileHover={{ backgroundColor: "rgba(180, 120, 30, 0.08)" }}
-                                    className="group p-8 sm:p-10 bg-[#130E0A] flex flex-col gap-4 transition-colors duration-300 cursor-default"
-                                >
-                                    <a.icon className="w-7 h-7 text-amber-400/80 group-hover:text-amber-400 transition-colors" />
-                                    <div>
-                                        <p className="font-semibold text-white text-sm sm:text-base tracking-wide mb-1">{a.label}</p>
-                                        <p className="text-white/40 text-xs sm:text-sm leading-relaxed">{a.desc}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-16">
+                        {[
+                            { title: "Deluxe Double Room", desc: "Our signature space. Flooded with natural light and featuring curated local art.", img: "./dhome.jpg" },
+                            { title: "Double with Balcony", desc: "Start your morning with a sea breeze on your private balcony overlooking the garden.", img: "./dhome4.jpg" },
+                            { title: "Triple Garden View", desc: "Spacious and versatile. Perfect for small families or close friends.", img: "./dhome3.jpg" },
+                            { title: "Family Suite", desc: "The ultimate retreat. Two connected spaces offering privacy and shared comfort.", img: "./dhome10.jpg" }
+                        ].map((room, i) => (
+                            <FadeUp key={room.title} delay={i * 0.1}>
+                                <div className="group cursor-pointer">
+                                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-8 shadow-sm">
+                                        <motion.img
+                                            src={room.img}
+                                            alt={room.title}
+                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
                                     </div>
-                                </motion.div>
+                                    <h3 className="font-serif text-2xl sm:text-3xl font-medium text-[#1C1613] mb-3">{room.title}</h3>
+                                    <p className="text-stone-500 text-base leading-relaxed mb-6">{room.desc}</p>
+                                    <div className="flex gap-4 text-stone-400">
+                                        <div className="flex items-center gap-1.5 text-xs tracking-widest uppercase"><Bed className="w-4 h-4" /> King Size</div>
+                                        <div className="flex items-center gap-1.5 text-xs tracking-widest uppercase"><Bath className="w-4 h-4" /> En-suite</div>
+                                    </div>
+                                </div>
                             </FadeUp>
                         ))}
                     </div>
@@ -604,85 +596,317 @@ const App: React.FC = () => {
             </section>
 
             {/* ══════════════════════════════════════════════════════
-                § 6 — GALLERY (bounce cards, light section)
+                § 4 — THE AMENITIES (Icon grid)
             ══════════════════════════════════════════════════════ */}
-            <section id="gallery" className="py-32 sm:py-48 bg-[#F9F6F1]">
+            <section id="amenities" className="py-32 sm:py-48 border-y border-stone-200 bg-white">
                 <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                    <FadeUp className="mb-4">
-                        <p className="text-amber-700/60 text-xs tracking-[0.4em] uppercase">Chapter V</p>
-                    </FadeUp>
-                    <MaskReveal className="mb-6">
-                        <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl font-light text-[#1C1613]">
-                            Explore the Spaces
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-24">
+                        <div className="max-w-xl">
+                            <FadeUp>
+                                <p className="text-[#1C1613]/40 text-xs tracking-[0.4em] uppercase mb-8">Chapter IV — The Essentials</p>
+                                <h2 className="font-serif text-4xl sm:text-6xl font-light text-[#1C1613] leading-[1.1]">
+                                    Everything you need,<br />
+                                    <em className="text-amber-600 not-italic">nothing you don't.</em>
+                                </h2>
+                            </FadeUp>
+                        </div>
+                        <FadeUp delay={0.2}>
+                            <button
+                                onClick={handleBookNow}
+                                className="px-10 py-5 bg-[#1C1613] text-white rounded-full text-sm tracking-widest uppercase font-semibold hover:bg-amber-900 transition-all shadow-xl shadow-stone-200"
+                            >
+                                View All Features
+                            </button>
+                        </FadeUp>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+                        {AMENITIES.map((item, i) => (
+                            <FadeUp key={item.label} delay={i * 0.05}>
+                                <div className="space-y-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-700">
+                                        <item.icon strokeWidth={1.5} className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-[#1C1613] text-lg mb-1">{item.label}</h4>
+                                        <p className="text-stone-400 text-sm leading-relaxed">{item.desc}</p>
+                                    </div>
+                                </div>
+                            </FadeUp>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Gallery Section */
+            }
+            {/* Gallery Section */}
+            {/*<section id="gallery"*/}
+            {/*         className="py-12 sm:py-16 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 rounded-xl shadow-lg my-8 sm:my-12 bg-amber-50 border border-amber-100"*/}
+            {/*         data-aos="fade-up">*/}
+            {/*    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-8 sm:mb-12 md:mb-16 text-amber-900">Explore*/}
+            {/*        Our Spaces</h2>*/}
+
+            {/*    /!* Room Types - Desktop: 2x2 grid, Mobile: 1 column *!/*/}
+            {/*    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 md:mb-12">*/}
+            {/*        {[*/}
+            {/*            {*/}
+            {/*                id: "deluxe-double",*/}
+            {/*                title: "Deluxe Double Room",*/}
+            {/*                coverImage: "./dhome.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome.jpg",*/}
+            {/*                    "./dhome11.jpg",*/}
+            {/*                    "./dhome9.jpg",*/}
+            {/*                    "./dhome16.jpg",*/}
+            {/*                    "./dhome1.jpg",*/}
+            {/*                    "./banjo6.jpg",*/}
+            {/*                    "./banjo8.jpg",*/}
+            {/*                    "./jasht9.jpg",*/}
+            {/*                    "./kuzhin77.jpg",*/}
+
+            {/*                ]*/}
+            {/*            },*/}
+            {/*            {*/}
+            {/*                id: "deluxe-double-balcony",*/}
+            {/*                title: "Deluxe Double Room with Balcony",*/}
+            {/*                coverImage: "./dhome4.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome4.jpg",*/}
+            {/*                    "./dhome17.jpg",*/}
+            {/*                    "./dhome5.jpg",*/}
+            {/*                    "./dhome24.jpg",*/}
+            {/*                    "./dhome6.jpg",*/}
+            {/*                    "./banjo7.jpg",*/}
+            {/*                    "./banjo1.jpg",*/}
+            {/*                    "./banjo3.jpg",*/}
+            {/*                    "./dhome13.jpg",*/}
+            {/*                    "./dhome20.jpg",*/}
+            {/*                    "./kuzhin79.jpg",*/}
+
+            {/*                ]*/}
+            {/*            },*/}
+            {/*            {*/}
+            {/*                id: "triple-garden",*/}
+            {/*                title: "Triple Room with Garden View",*/}
+            {/*                coverImage: "./dhome3.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome3.jpg",*/}
+            {/*                    "./dhome21.jpg",*/}
+            {/*                    "./dhome22.jpg",*/}
+            {/*                    "./dhome23.jpg",*/}
+            {/*                    "./dhome8.jpg",*/}
+            {/*                    "./banjo2.jpg",*/}
+            {/*                    "./dhome25.jpg",*/}
+            {/*                    "./jasht2.jpg",*/}
+            {/*                    "./kuzhin2.jpg",*/}
+
+            {/*                ]*/}
+            {/*            },*/}
+            {/*            {*/}
+            {/*                id: "family-suite",*/}
+            {/*                title: "Deluxe Family Suite",*/}
+            {/*                coverImage: "./dhome10.jpg",*/}
+            {/*                images: [*/}
+            {/*                    "./dhome10.jpg",*/}
+            {/*                    "./dhome71.jpg",*/}
+            {/*                    "./dhome73.jpg",*/}
+            {/*                    "./dhome75.jpg",*/}
+            {/*                    "./dhome74.jpg",*/}
+            {/*                    "./dhome12.jpg",*/}
+            {/*                    "./dhome15.jpg",*/}
+            {/*                    "./dhome76.jpg",*/}
+            {/*                    "./banjo5.jpg",*/}
+            {/*                    "./banjo8.jpg",*/}
+            {/*                    "./banjo9.jpg",*/}
+            {/*                    "./kuzhin.jpg",*/}
+
+
+            {/*                ]*/}
+            {/*            }*/}
+            {/*        ].map((g, i) => (*/}
+            {/*            <div*/}
+            {/*                key={g.id}*/}
+            {/*                className="relative group cursor-pointer rounded-lg sm:rounded-xl overflow-hidden shadow-md h-48 sm:h-64 md:h-80"*/}
+            {/*                onClick={() => {*/}
+            {/*                    setLightboxState({*/}
+            {/*                        open: true,*/}
+            {/*                        index: 0,*/}
+            {/*                        images: g.images*/}
+            {/*                    });*/}
+            {/*                }}*/}
+            {/*                data-aos="fade-up"*/}
+            {/*                data-aos-delay={i * 100}*/}
+            {/*            >*/}
+            {/*                <div*/}
+            {/*                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"*/}
+            {/*                    style={{backgroundImage: `url(${g.coverImage})`}}*/}
+            {/*                />*/}
+            {/*                <div*/}
+            {/*                    className="absolute inset-0 bg-amber-900/40 group-hover:bg-amber-900/60 transition-opacity duration-300"/>*/}
+            {/*                <div className="absolute inset-0 flex items-center justify-center z-10">*/}
+            {/*                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-50 drop-shadow-lg">{g.title}</h3>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        ))}*/}
+            {/*    </div>*/}
+
+            {/*    /!* Outdoor Section - Full width in both desktop and mobile *!/*/}
+            {/*    <div*/}
+            {/*        className="relative group cursor-pointer rounded-lg sm:rounded-xl overflow-hidden shadow-md h-48 sm:h-64 md:h-80 w-full"*/}
+            {/*        onClick={() => {*/}
+            {/*            setLightboxState({*/}
+            {/*                open: true,*/}
+            {/*                index: 0,*/}
+            {/*                images: [*/}
+            {/*                    "./jasht1.jpg",*/}
+            {/*                    "./jasht3.jpg",*/}
+            {/*                    "./jasht4.jpg",*/}
+            {/*                    "./jasht5.jpg",*/}
+            {/*                    "./jasht6.jpg",*/}
+            {/*                    "./jasht7.jpg",*/}
+            {/*                    "./jasht8.jpg"*/}
+            {/*                ]*/}
+            {/*            });*/}
+            {/*        }}*/}
+            {/*        data-aos="fade-up"*/}
+            {/*    >*/}
+            {/*        <div*/}
+            {/*            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"*/}
+            {/*            style={{backgroundImage: "url('./jasht1.jpg')"}}*/}
+            {/*        />*/}
+            {/*        <div*/}
+            {/*            className="absolute inset-0 bg-amber-900/40 group-hover:bg-amber-900/60 transition-opacity duration-300"/>*/}
+            {/*        <div className="absolute inset-0 flex items-center justify-center z-10">*/}
+            {/*            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-50 drop-shadow-lg">Outdoor*/}
+            {/*                Spaces</h3>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+
+            {/*    <Lightbox*/}
+            {/*        open={lightboxState.open}*/}
+            {/*        close={() => setLightboxState({...lightboxState, open: false})}*/}
+            {/*        index={lightboxState.index}*/}
+            {/*        slides={lightboxState.images.map(img => ({src: img}))}*/}
+            {/*        controller={{*/}
+            {/*            closeOnBackdropClick: true,*/}
+            {/*            closeOnPullDown: true,*/}
+            {/*        }}*/}
+            {/*        render={{*/}
+            {/*            iconPrev: () => <ChevronLeft size={isMobile ? 32 : 48} className="text-amber-700"/>,*/}
+            {/*            iconNext: () => <ChevronRight size={isMobile ? 32 : 48} className="text-amber-700"/>,*/}
+            {/*            iconClose: () => <X size={isMobile ? 24 : 32} className="text-amber-700"/>,*/}
+            {/*        }}*/}
+            {/*    />*/}
+            {/*</section>*/}
+            {/* ══════════════════════════════════════════════════════
+                § 5 — THE GALLERY (Interactive stack)
+            ══════════════════════════════════════════════════════ */}
+            <section id="gallery" className="py-32 sm:py-48 bg-[#130E0A] overflow-hidden">
+                <div className="max-w-7xl mx-auto px-6 sm:px-12 text-center mb-24">
+                    <FadeUp>
+                        <p className="text-amber-400/70 text-xs tracking-[0.4em] uppercase mb-8">Chapter V — The Perspective</p>
+                        <h2 className="font-serif text-5xl sm:text-7xl font-light text-white leading-tight">
+                            Captured<br />
+                            <em className="text-amber-400 not-italic">Moments.</em>
                         </h2>
-                    </MaskReveal>
-                    <FadeUp delay={0.3} className="mb-16 sm:mb-24">
-                        <p className="text-stone-500 text-base sm:text-lg max-w-xl">
-                            Hover to fan the cards apart. Click to step inside.
-                        </p>
                     </FadeUp>
                 </div>
 
-                <FadeUp delay={0.2}>
-                    <div className="flex justify-center items-center py-10 overflow-visible">
-                        <BounceCards
-                            className="custom-bounceCards"
-                            images={GALLERY_IMAGES}
-                            titles={GALLERY_TITLES}
-                            containerWidth={isMobile ? "100%" : 800}
-                            containerHeight={isMobile ? 450 : 600}
-                            animationDelay={0.5}
-                            animationStagger={0.08}
-                            easeType="elastic.out(1, 0.5)"
-                            enableHover={true}
-                            hoverPushOffset={isMobile ? 130 : 220}
-                            transformStyles={isMobile
-                                ? ["rotate(10deg) translate(-150px)", "rotate(5deg) translate(-75px)", "rotate(-3deg)", "rotate(-10deg) translate(75px)", "rotate(2deg) translate(150px)"]
-                                : ["rotate(10deg) translate(-260px)", "rotate(5deg) translate(-130px)", "rotate(-3deg)", "rotate(-10deg) translate(130px)", "rotate(2deg) translate(260px)"]
-                            }
-                            onCardClick={(idx) => setLightboxState({ open: true, index: idx, images: GALLERY_DATA[idx].images })}
-                        />
-                    </div>
-                </FadeUp>
+                <div className="flex flex-col items-center gap-24">
+                    {/* Featured collection */}
+                    <FadeUp className="w-full flex justify-center">
+                        <div className="h-[400px] sm:h-[600px] w-full max-w-4xl">
+                            <BounceCards
+                                className="custom-bounce-cards"
+                                images={GALLERY_IMAGES}
+                                containerSize={isMobile ? 350 : 600}
+                                transformStyles={[
+                                    "rotate(10deg) translate(-150px, -100px)",
+                                    "rotate(-5deg) translate(120px, -120px)",
+                                    "rotate(8deg) translate(-100px, 150px)",
+                                    "rotate(-10deg) translate(140px, 160px)",
+                                    "rotate(2deg) translate(0px, 0px)"
+                                ]}
+                            />
+                        </div>
+                    </FadeUp>
 
-                {/* Gallery lightbox */}
+                    {/* Category Stacks */}
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-6 px-6 sm:px-12 w-full max-w-7xl">
+                        {galleryData.map((category, idx) => (
+                            <FadeUp key={category.id} delay={idx * 0.1} className="flex flex-col items-center">
+                                <div
+                                    className="relative w-48 h-64 mb-12 cursor-pointer"
+                                    onClick={() => setLightboxState({ open: true, index: 0, images: category.images })}
+                                >
+                                    <Stack
+                                        randomRotation={true}
+                                        sensitivity={180}
+                                        sendToBackOnClick={true}
+                                        cardDimensions={{ width: 192, height: 256 }}
+                                        cardsData={category.images.slice(0, 5).map(img => ({ id: img, img }))}
+                                    />
+                                    <div className="absolute -bottom-4 inset-x-0 text-center">
+                                        <span className="bg-amber-400 text-[#1C1613] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full shadow-lg">
+                                            {category.images.length} Photos
+                                        </span>
+                                    </div>
+                                </div>
+                                <h4 className="font-serif text-xl font-medium text-white">{category.title}</h4>
+                            </FadeUp>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Lightbox placeholder/trigger for stack */}
                 <AnimatePresence>
                     {lightboxState.open && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-2xl"
+                            className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 sm:p-12"
                         >
                             <button
-                                onClick={() => setLightboxState(p => ({ ...p, open: false }))}
-                                className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-[210]"
+                                onClick={() => setLightboxState({ ...lightboxState, open: false })}
+                                className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-8 h-8" />
                             </button>
-                            <motion.div
-                                initial={{ scale: 0.85, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.85, opacity: 0 }}
-                                transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                                className="w-full max-w-3xl h-[60vh] flex items-center justify-center px-4"
-                            >
-                                <div className="w-64 h-64 sm:w-80 sm:h-80 md:w-[420px] md:h-[420px]">
-                                    <Stack
-                                        randomRotation={true}
-                                        sensitivity={200}
-                                        sendToBackOnClick={true}
-                                        cards={lightboxState.images.map((src, i) => (
-                                            <img key={i} src={src} alt={`photo-${i + 1}`}
-                                                className="w-full h-full object-cover rounded-2xl border-4 border-white shadow-2xl"
-                                            />
-                                        ))}
-                                    />
+
+                            <div className="w-full max-w-5xl aspect-video relative group">
+                                <img
+                                    src={lightboxState.images[lightboxState.index]}
+                                    alt="Gallery preview"
+                                    className="w-full h-full object-contain"
+                                />
+
+                                {/* Navigation */}
+                                <button
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => setLightboxState(prev => ({
+                                        ...prev,
+                                        index: (prev.index - 1 + prev.images.length) % prev.images.length
+                                    }))}
+                                >
+                                    <ChevronLeft />
+                                </button>
+                                <button
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => setLightboxState(prev => ({
+                                        ...prev,
+                                        index: (prev.index + 1) % prev.images.length
+                                    }))}
+                                >
+                                    <ChevronRight />
+                                </button>
+
+                                <div className="absolute -bottom-12 left-0 right-0 text-center">
+                                    <p className="text-white/40 text-xs tracking-widest uppercase">
+                                        Image {lightboxState.index + 1} of {lightboxState.images.length}
+                                    </p>
                                 </div>
-                            </motion.div>
-                            <div className="absolute bottom-10 text-center text-white px-4">
-                                <p className="font-serif text-xl mb-1">{GALLERY_DATA[lightboxState.index]?.title}</p>
-                                <p className="text-white/50 text-sm">Tap cards to browse photos</p>
                             </div>
                         </motion.div>
                     )}
@@ -690,208 +914,199 @@ const App: React.FC = () => {
             </section>
 
             {/* ══════════════════════════════════════════════════════
-                § 7 — REVIEWS (dark, horizontal scroll)
+                § 6 — THE GUEST BOOK (Reviews)
             ══════════════════════════════════════════════════════ */}
-            <section id="reviews" className="bg-[#130E0A] text-white py-32 sm:py-48">
-                <div className="max-w-7xl mx-auto px-6 sm:px-12 mb-16 sm:mb-24">
-                    <FadeUp className="mb-4">
-                        <p className="text-amber-400/70 text-xs tracking-[0.4em] uppercase">Chapter VI</p>
-                    </FadeUp>
-                    <MaskReveal>
-                        <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl font-light">
-                            Our Guests <em className="text-amber-400 not-italic">Speak.</em>
-                        </h2>
-                    </MaskReveal>
-                </div>
+            <section id="reviews" className="py-32 sm:py-48 bg-[#F9F6F1] overflow-hidden">
+                <div className="max-w-7xl mx-auto px-6 sm:px-12">
+                    <div className="grid lg:grid-cols-3 gap-24 items-start">
 
-                {/* Horizontal scroll reviews */}
-                {reviews.length === 0 ? (
-                    <div className="text-center text-white/40 py-12">No reviews yet — be the first!</div>
-                ) : (
-                    <div className="relative px-6 sm:px-12">
-                        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#130E0A] to-transparent z-10 pointer-events-none" />
-                        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#130E0A] to-transparent z-10 pointer-events-none" />
-                        <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 css-hide-scrollbar">
-                            {reviews.map((r, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, x: 60 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.7, delay: Math.min(i * 0.1, 0.6) }}
-                                    className="snap-center shrink-0 w-[85vw] sm:w-[420px] bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-10 flex flex-col justify-between"
-                                >
-                                    <div>
-                                        <div className="text-5xl font-serif text-amber-400/30 leading-none mb-6">"</div>
-                                        <p className="text-white/80 text-base sm:text-lg leading-relaxed italic mb-8 line-clamp-5">
-                                            {r.comment}
-                                        </p>
-                                    </div>
-                                    <div className="border-t border-white/10 pt-5">
-                                        {renderStars(r.rating)}
-                                        <p className="font-semibold text-white mt-3">{r.name}</p>
-                                        <p className="text-white/40 text-xs mt-1 flex justify-between">
-                                            <span>{r.country}</span><span>{r.date}</span>
-                                        </p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                        {/* Left — title and form */}
+                        <div className="lg:sticky lg:top-32 space-y-12">
+                            <div>
+                                <FadeUp>
+                                    <p className="text-[#1C1613]/40 text-xs tracking-[0.4em] uppercase mb-8">Chapter VI — The Voice</p>
+                                    <h2 className="font-serif text-4xl sm:text-6xl font-light text-[#1C1613] leading-none mb-8">
+                                        Stories from<br />
+                                        <em className="text-amber-600 not-italic">our Guests.</em>
+                                    </h2>
+                                    <p className="text-stone-500 text-lg font-light leading-relaxed">
+                                        We believe the best tellers of our story are those who have lived it.
+                                    </p>
+                                </FadeUp>
+                            </div>
 
-                {/* Review form */}
-                <div className="max-w-3xl mx-auto px-6 sm:px-12 mt-20 sm:mt-32">
-                    <FadeUp className="mb-10">
-                        <h3 className="font-serif text-3xl sm:text-4xl text-white font-light">
-                            Share Your Experience
-                        </h3>
-                    </FadeUp>
-                    <FadeUp delay={0.1}>
-                        <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                            <input
-                                type="text"
-                                placeholder="Your Name"
-                                value={newReview.name}
-                                onChange={e => setNewReview(p => ({ ...p, name: e.target.value }))}
-                                className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 transition-colors text-sm"
-                            />
-                            <Select
-                                options={COUNTRY_OPTIONS}
-                                placeholder="Your Country"
-                                value={COUNTRY_OPTIONS.find((c: any) => c.value === newReview.country) || null}
-                                onChange={(opt: any) => setNewReview(p => ({ ...p, country: opt?.value }))}
-                                styles={{
-                                    control: (p) => ({ ...p, backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.75rem", padding: "0.5rem", boxShadow: "none", "&:hover": { borderColor: "rgba(251,191,36,0.5)" } }),
-                                    menu: (p) => ({ ...p, backgroundColor: "#1C1613", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.75rem" }),
-                                    option: (p, s) => ({ ...p, backgroundColor: s.isSelected ? "rgba(251,191,36,0.2)" : "transparent", color: "rgba(255,255,255,0.8)", "&:hover": { backgroundColor: "rgba(255,255,255,0.05)" } }),
-                                    placeholder: (p) => ({ ...p, color: "rgba(255,255,255,0.3)", fontSize: "0.875rem" }),
-                                    singleValue: (p) => ({ ...p, color: "white" }),
-                                    input: (p) => ({ ...p, color: "white" }),
-                                }}
-                            />
-                        </div>
-                        <textarea
-                            placeholder="Tell future guests what made your stay special..."
-                            value={newReview.comment}
-                            onChange={e => setNewReview(p => ({ ...p, comment: e.target.value }))}
-                            rows={4}
-                            className="w-full mb-4 px-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 transition-colors text-sm resize-none"
-                        />
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-3">
-                                <span className="text-white/50 text-sm">Rating</span>
-                                <div className="flex gap-1">
-                                    {[1, 2, 3, 4, 5].map(i => (
-                                        <button key={i} onClick={() => setNewReview(p => ({ ...p, rating: i }))}>
-                                            <Star
-                                                className={`w-6 h-6 transition-all hover:scale-110 ${newReview.rating >= i ? "text-amber-400 fill-amber-400" : "text-white/20"}`}
-                                            />
+                            {/* Add Review Sidebar */}
+                            <FadeUp delay={0.2}>
+                                <div className="bg-white p-8 rounded-3xl border border-stone-200 shadow-sm">
+                                    <h4 className="font-serif text-xl text-[#1C1613] mb-6">Leave your mark</h4>
+                                    <div className="space-y-4">
+                                        <input
+                                            type="text"
+                                            placeholder="Your Name"
+                                            value={newReview.name}
+                                            onChange={e => setNewReview({ ...newReview, name: e.target.value })}
+                                            className="w-full px-5 py-3 rounded-2xl bg-stone-50 border-none text-sm focus:ring-2 focus:ring-amber-200 transition-all"
+                                        />
+                                        <Select
+                                            options={COUNTRY_OPTIONS}
+                                            placeholder="Your Country"
+                                            value={COUNTRY_OPTIONS.find(c => c.value === newReview.country)}
+                                            onChange={(opt: any) => setNewReview({ ...newReview, country: opt?.label })}
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    borderRadius: '1rem',
+                                                    padding: '0.25rem',
+                                                    border: 'none',
+                                                    backgroundColor: '#f8fafc',
+                                                    fontSize: '0.875rem'
+                                                })
+                                            }}
+                                        />
+                                        <div className="flex gap-2 py-2">
+                                            {[1, 2, 3, 4, 5].map(star => (
+                                                <button key={star} onClick={() => setNewReview({ ...newReview, rating: star })}>
+                                                    <Star className={`w-6 h-6 ${newReview.rating >= star ? "text-amber-400 fill-amber-400" : "text-stone-200"}`} />
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <textarea
+                                            placeholder="Share your experience..."
+                                            value={newReview.comment}
+                                            onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
+                                            rows={4}
+                                            className="w-full px-5 py-3 rounded-2xl bg-stone-50 border-none text-sm focus:ring-2 focus:ring-amber-200 transition-all"
+                                        />
+                                        <button
+                                            onClick={handleAddReview}
+                                            className="w-full py-4 bg-amber-600 text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase hover:bg-amber-700 transition-all"
+                                        >
+                                            Publish Note
                                         </button>
+                                    </div>
+                                </div>
+                            </FadeUp>
+                        </div>
+
+                        {/* Right — Scrolling carousel of reviews */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {reviews.length === 0 ? (
+                                <div className="h-64 flex items-center justify-center border-2 border-dashed border-stone-200 rounded-3xl text-stone-300 uppercase tracking-widest text-xs">
+                                    Waiting for the first story...
+                                </div>
+                            ) : (
+                                <div className="grid sm:grid-cols-2 gap-6">
+                                    {reviews.map((rev, i) => (
+                                        <FadeUp key={i} delay={i * 0.1}>
+                                            <div className="bg-white p-8 rounded-3xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div>
+                                                        <h5 className="font-serif text-lg text-[#1C1613]">{rev.name}</h5>
+                                                        <p className="text-stone-400 text-xs uppercase tracking-widest">{rev.country}</p>
+                                                    </div>
+                                                    <div className="flex">
+                                                        {renderStars(rev.rating)}
+                                                    </div>
+                                                </div>
+                                                <p className="text-stone-500 font-light leading-relaxed italic">"{rev.comment}"</p>
+                                                <div className="mt-6 pt-6 border-t border-stone-50">
+                                                    <p className="text-stone-300 text-[10px] uppercase tracking-widest">{rev.date}</p>
+                                                </div>
+                                            </div>
+                                        </FadeUp>
                                     ))}
                                 </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════════════════
+                § 7 — THE FOOTER (Final notes)
+            ══════════════════════════════════════════════════════ */}
+            <footer className="bg-[#1C1613] text-white pt-32 pb-16">
+                <div className="max-w-7xl mx-auto px-6 sm:px-12">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+
+                        {/* Brand */}
+                        <div className="space-y-8">
+                            <h3 className="font-serif text-3xl font-light">Villa<br /><span className="text-amber-400">Safira</span></h3>
+                            <p className="text-white/40 text-sm leading-loose max-w-xs">
+                                A boutique retreat in Durrës, where the warmth of Albanian hospitality meets the calm of the Adriatic shore.
+                            </p>
+                        </div>
+
+                        {/* Navigation */}
+                        <div className="space-y-8">
+                            <h4 className="text-xs tracking-[0.3em] uppercase text-white/40">Navigation</h4>
+                            <ul className="space-y-4">
+                                {NAV_LINKS.map(link => (
+                                    <li key={link}>
+                                        <button
+                                            onClick={() => scrollTo(link)}
+                                            className="text-white/70 hover:text-amber-400 text-sm uppercase tracking-widest transition-colors"
+                                        >
+                                            {link}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Contact */}
+                        <div className="space-y-8">
+                            <h4 className="text-xs tracking-[0.3em] uppercase text-white/40">Contact</h4>
+                            <div className="space-y-6">
+                                <a href="mailto:villasafiradurres@gmail.com" className="flex items-center gap-4 group">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-[#1C1613] transition-all">
+                                        <Mail className="w-4 h-4" />
+                                    </div>
+                                    <span className="text-sm text-white/70 group-hover:text-white transition-colors">villasafiradurres@gmail.com</span>
+                                </a>
+                                <div className="flex items-center gap-4 group cursor-pointer" onClick={openWhatsApp}>
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-[#1C1613] transition-all">
+                                        <Phone className="w-4 h-4" />
+                                    </div>
+                                    <span className="text-sm text-white/70 group-hover:text-white transition-colors">+355 69 242 9567</span>
+                                </div>
+                                <a href="https://maps.app.goo.gl/hZa8t1TER1ymqn338" target="_blank" rel="noreferrer" className="flex items-center gap-4 group">
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-[#1C1613] transition-all">
+                                        <MapPin className="w-4 h-4" />
+                                    </div>
+                                    <span className="text-sm text-white/70 group-hover:text-white transition-colors">Durrës, Albania</span>
+                                </a>
                             </div>
-                            <button
-                                onClick={handleAddReview}
-                                className="group relative overflow-hidden px-8 py-3 rounded-full bg-amber-500 text-[#1C1613] font-bold text-sm tracking-widest uppercase hover:bg-amber-400 transition-colors w-full sm:w-auto"
-                            >
-                                Submit Review
-                            </button>
                         </div>
-                    </FadeUp>
-                </div>
-            </section>
 
-            {/* ══════════════════════════════════════════════════════
-                § 8 — FULL-SCREEN BOOK CTA
-            ══════════════════════════════════════════════════════ */}
-            <section className="relative h-screen overflow-hidden flex items-center justify-center bg-black">
-                <div className={`absolute inset-0 bg-cover bg-center opacity-40 ${!isMobile ? 'bg-fixed' : ''}`} style={{ backgroundImage: "url('/jasht3.jpg')" }} />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80" />
-                <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-                    <MaskReveal className="mb-6">
-                        <p className="text-amber-400 text-xs tracking-[0.4em] uppercase mb-4">Your Story Begins Here</p>
-                        <h2 className="font-serif text-6xl sm:text-7xl md:text-8xl text-white font-light leading-none">
-                            Ready to Arrive?
-                        </h2>
-                    </MaskReveal>
-                    <FadeUp delay={0.4} className="mb-12">
-                        <p className="text-white/60 text-lg sm:text-xl font-light max-w-xl mx-auto">
-                            Reserve your room today and begin your Albanian coastal escape.
-                        </p>
-                    </FadeUp>
-                    <FadeUp delay={0.6}>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button
-                                onClick={handleBookNow}
-                                className="px-10 py-5 bg-amber-500 text-[#1C1613] font-bold text-sm tracking-widest uppercase rounded-full hover:bg-amber-400 transition-all duration-300 hover:scale-105"
-                            >
-                                Book on Booking.com
-                            </button>
-                            <button
-                                onClick={openWhatsApp}
-                                className="px-10 py-5 border border-white/40 text-white font-medium text-sm tracking-widest uppercase rounded-full hover:bg-white/10 transition-all duration-300"
-                            >
-                                Contact Us Directly
-                            </button>
+                        {/* Social/Status */}
+                        <div className="space-y-8">
+                            <h4 className="text-xs tracking-[0.3em] uppercase text-white/40">Newsletter</h4>
+                            <div className="relative">
+                                <input
+                                    type="email"
+                                    placeholder="your@email.com"
+                                    className="w-full bg-white/5 border-b border-white/10 py-4 text-sm focus:border-amber-400 outline-none transition-all"
+                                />
+                                <button className="absolute right-0 top-1/2 -translate-y-1/2 text-amber-400 text-xs uppercase tracking-widest font-bold">Join</button>
+                            </div>
                         </div>
-                    </FadeUp>
-                </div>
-            </section>
-
-            {/* ══════════════════════════════════════════════════════
-                FOOTER
-            ══════════════════════════════════════════════════════ */}
-            <footer className="bg-[#0D0A07] text-white">
-                <div className="max-w-7xl mx-auto px-6 sm:px-12 py-16 sm:py-24 grid sm:grid-cols-3 gap-12">
-                    <div>
-                        <p className="font-serif text-2xl tracking-widest uppercase font-bold text-white mb-4">Villa Safira</p>
-                        <p className="text-white/40 text-sm leading-relaxed max-w-xs">
-                            A boutique retreat on Albania's Adriatic coast. Four rooms. Infinite calm.
-                        </p>
                     </div>
-                    <div>
-                        <p className="text-white/30 text-xs tracking-[0.3em] uppercase mb-5">Navigate</p>
-                        <ul className="space-y-3">
-                            {NAV_LINKS.map(link => (
-                                <li key={link}>
-                                    <button
-                                        onClick={() => scrollTo(link)}
-                                        className="text-white/60 text-sm hover:text-amber-400 tracking-wide capitalize transition-colors"
-                                    >
-                                        {link}
-                                    </button>
-                                </li>
+
+                    <div className="pt-16 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-8">
+                        <p className="text-white/20 text-[10px] tracking-[0.3em] uppercase">
+                            © {new Date().getFullYear()} Villa Safira · Albania
+                        </p>
+                        <div className="flex gap-8">
+                            {["Instagram", "Facebook", "Booking"].map(soc => (
+                                <button key={soc} className="text-white/20 hover:text-white transition-colors text-[10px] tracking-[0.3em] uppercase">
+                                    {soc}
+                                </button>
                             ))}
-                        </ul>
-                    </div>
-                    <div>
-                        <p className="text-white/30 text-xs tracking-[0.3em] uppercase mb-5">Contact</p>
-                        <div className="space-y-4">
-                            <a href="https://maps.app.goo.gl/hZa8t1TER1ymqn338" target="_blank" rel="noopener noreferrer"
-                                className="flex items-start gap-3 text-white/60 hover:text-amber-400 transition-colors text-sm">
-                                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-amber-500" />
-                                <span>Durrës, Albania<br />Adriatic Coast</span>
-                            </a>
-                            <a href="mailto:villasafiradurres@gmail.com"
-                                className="flex items-center gap-3 text-white/60 hover:text-amber-400 transition-colors text-sm">
-                                <Mail className="w-4 h-4 shrink-0 text-amber-500" />
-                                villasafiradurres@gmail.com
-                            </a>
-                            <button onClick={openWhatsApp}
-                                className="flex items-center gap-3 text-white/60 hover:text-amber-400 transition-colors text-sm">
-                                <Phone className="w-4 h-4 shrink-0 text-amber-500" />
-                                +355 69 242 9567
-                            </button>
                         </div>
                     </div>
-                </div>
-                <div className="border-t border-white/5 px-6 sm:px-12 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-white/20 text-xs tracking-widest uppercase">
-                    <span>© {new Date().getFullYear()} Villa Safira. All rights reserved.</span>
-                    <span>Durrës · Albania · Adriatic</span>
                 </div>
             </footer>
-
         </div>
     );
 };
