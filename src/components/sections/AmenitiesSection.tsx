@@ -30,19 +30,19 @@ export const AmenitiesSection: React.FC = () => {
                 </div>
 
                 {/* Amenities grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-14">
+                <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-10 sm:gap-y-14">
                     {AMENITIES.map((item, i) => (
                         <FadeUp key={item.label} delay={i * 0.04}>
-                            <div className="group space-y-4 cursor-default">
+                            <div className="group space-y-3 sm:space-y-4 cursor-default">
                                 {/* Icon container */}
-                                <div className="w-14 h-14 rounded-2xl bg-navy flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-400 shadow-md shadow-navy/15">
-                                    <item.icon strokeWidth={1.5} className="w-6 h-6" />
+                                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-navy flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-400 shadow-md shadow-navy/15">
+                                    <item.icon strokeWidth={1.5} className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold text-warmBlack text-base mb-1 group-hover:text-gold transition-colors duration-300">
+                                    <h4 className="font-semibold text-warmBlack text-[10px] sm:text-base mb-0.5 sm:mb-1 group-hover:text-gold transition-colors duration-300 line-clamp-1">
                                         {item.label}
                                     </h4>
-                                    <p className="text-warmMuted text-sm leading-relaxed">{item.desc}</p>
+                                    <p className="text-warmMuted text-[8px] sm:text-sm leading-snug sm:leading-relaxed line-clamp-2">{item.desc}</p>
                                 </div>
                             </div>
                         </FadeUp>
