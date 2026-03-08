@@ -4,15 +4,26 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Outfit', 'sans-serif'],
-                serif: ['Playfair Display', 'serif'],
+                serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                sans: ['Raleway', 'ui-sans-serif', 'sans-serif'],
             },
             colors: {
-                beige: '#f5f5dc',
-                lightBeige: '#f9f6f2',
-                brown: '#5c4033',
-                darkBrown: '#4b3621',
-                darkerBrown: '#3d2b1f',
+                // Dark backgrounds
+                navy: '#0B1728',
+                navyMid: '#132236',
+                navyLight: '#1A3048',
+                // Gold accent
+                gold: '#C9A052',
+                goldDark: '#A87B30',
+                goldLight: '#E4C47B',
+                // Light backgrounds
+                ivory: '#FAF7F2',
+                cream: '#F0E9DF',
+                sand: '#E2D5C8',
+                // Text
+                warmBlack: '#1C1613',
+                warmMuted: '#8B7B6A',
+                warmBorder: '#E2D5C8',
             },
         },
     },

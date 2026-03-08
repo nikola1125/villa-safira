@@ -189,7 +189,7 @@ export default function BounceCards({
           <div
             className="w-40 h-40 sm:w-56 sm:h-56 md:w-[240px] aspect-square border-4 sm:border-8 border-white rounded-xl sm:rounded-[30px] overflow-hidden shadow-xl"
           >
-            <img className="w-full h-full object-cover" src={src} alt={`card-${idx}`} />
+            <img loading="lazy" className="w-full h-full object-cover" src={src} alt={`bouncy card ${idx + 1}`} />
           </div>
           {titles[idx] && (
             <div className="mt-3 px-3 py-1 bg-transparent">
