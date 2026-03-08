@@ -27,8 +27,8 @@ export const Navbar: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             className={`fixed top-0 inset-x-0 z-50 transition-all duration-700 ${isScrolled
-                    ? 'bg-ivory/95 backdrop-blur-xl border-b border-sand shadow-sm py-2'
-                    : 'bg-transparent py-6'
+                ? 'bg-ivory/95 backdrop-blur-xl border-b border-sand shadow-sm py-2'
+                : 'bg-transparent py-6'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 relative">
@@ -62,6 +62,11 @@ export const Navbar: React.FC = () => {
                             }}
                             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                             className="w-auto object-contain rounded-full border border-sand/20 shadow-md"
+                            style={{
+                                imageRendering: 'auto',
+                                transform: 'translateZ(0)',
+                                backfaceVisibility: 'hidden'
+                            }}
                         />
                     </button>
 
@@ -81,8 +86,8 @@ export const Navbar: React.FC = () => {
                         <button
                             onClick={handleBookNow}
                             className={`ml-2 text-[10px] tracking-[0.3em] uppercase font-semibold px-6 py-3 rounded-full border transition-all duration-400 ${isScrolled
-                                    ? 'border-gold text-gold hover:bg-gold hover:text-white'
-                                    : 'border-white/70 text-white hover:bg-white hover:text-warmBlack'
+                                ? 'border-gold text-gold hover:bg-gold hover:text-white'
+                                : 'border-white/70 text-white hover:bg-white hover:text-warmBlack'
                                 }`}
                         >
                             Book
