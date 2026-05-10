@@ -1,0 +1,208 @@
+/* -------------------------------------------------
+   Villa Safira – Luxury Frontend
+   ------------------------------------------------- */
+
+/* ---------- Root & Theme ---------- */
+:root {
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Merriweather', serif;
+
+  --color-bg: #111111;
+  --color-bg-light: #F7F5F2;
+  --color-primary: #D4AF37;   /* gold */
+  --color-primary-dark: #B08A2E;
+  --color-text: #E5E5E5;
+  --color-text-muted: #AFAFAF;
+}
+
+/* Light mode fallback (optional) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: #F7F5F2;
+    --color-text: #111111;
+    --color-text-muted: #333333;
+  }
+}
+
+/* ---------- Global Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+  font-size: 100%; /* 16px */
+}
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg) url('assets/noise.png') repeat;
+  line-height: 1.6;
+}
+
+/* ---------- Utility Classes ---------- */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform .2s, background-color .2s;
+}
+.btn--primary {
+  background: var(--color-primary);
+  color: #111;
+}
+.btn--primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+.btn--secondary {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+}
+.btn--secondary:hover {
+  background: var(--color-primary);
+  color: #111;
+}
+
+/* ---------- Hero Section ---------- */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  background: url('assets/hero.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,.2));
+}
+.hero__content {
+  position: relative;
+  text-align: center;
+  color: #fff;
+}
+.hero__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  margin-bottom: .5rem;
+  letter-spacing: .02em;
+}
+.hero__subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- Sections ---------- */
+.section {
+  background: var(--color-bg-light);
+  color: var(--color-bg);
+}
+.section--dark {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.section__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem,5vw,3rem);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.section__text {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ---------- Gallery ---------- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.gallery__item {
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  transition: transform .3s, box-shadow .3s;
+}
+.gallery__item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.35);
+}
+.gallery__item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- Amenities ---------- */
+.amenities {
+  list-style: none;
+  max-width: 600px;
+  margin: 2rem auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+}
+.amenities li {
+  position: relative;
+  padding-left: 1.2rem;
+}
+.amenities li::before {
+  content: "▹";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* ---------- Divider SVG ---------- */
+.divider {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+/* ---------- Reveal Animation ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .6s ease-out, transform .6s ease-out;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .btn, .gallery__item {
+    transition: none;
+  }
+}
+
+/* ---------- Responsive Adjustments ---------- */
+@media (max-width: 768px) {
+  .hero__title { font-size: 2.5rem; }
+  .hero__subtitle { font-size: 1rem; }
+}

@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Global Base ─────────────────────────────────────────────── */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+@media (max-width: 640px), (prefers-reduced-motion: reduce) {
+    .backdrop-blur-sm,
+    .backdrop-blur-md,
+    .backdrop-blur-lg,
+    .backdrop-blur-xl,
+    .backdrop-blur-2xl,
+    .backdrop-blur-3xl {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
+
+html {
+    scroll-snap-type: y proximity;
+}
+
+@media (max-width: 768px) {
+    html {
+        scroll-snap-type: y proximity;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-snap-type: none;
+    }
+}
+
+section.snap-start,
+footer.snap-start {
+    scroll-snap-align: start;
+}
+
+body {
+    font-family: 'Raleway', sans-serif;
+    background-color: #F7F6EF;
+    color: #141A16;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Typography Utilities ────────────────────────────────────── */
+@layer utilities {
+    .font-display {
+        font-family: 'Playfair Display', Georgia, serif;
+    }
+
+    /* Scrollbar hiding */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Glassmorphism panels */
+    .glass-light {
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .glass-dark {
+        background: rgba(20,26,22,0.72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(107,125,58,0.18);
+    }
+
+    /* Gold text gradient */
+    .text-gold-gradient {
+        background: linear-gradient(135deg, #A3B36A 0%, #6B7D3A 50%, #55642F 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Section label style */
+    .section-label {
+        font-family: 'Raleway', sans-serif;
+        font-size: 0.65rem;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        font-weight: 500;
+    }
+}
+
+/* ─── Smooth parallax on iOS ─────────────────────────────────── */
+@supports (-webkit-touch-callout: none) {
+    .parallax-ios {
+        -webkit-background-attachment: scroll;
+        background-attachment: scroll;
+    }
+}
+
+/* ─── React-select overrides for review form ─────────────────── */
+.vs__control {
+    border-radius: 1rem !important;
+}
