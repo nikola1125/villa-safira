@@ -23,9 +23,9 @@ export const Navbar: React.FC = () => {
 
     return (
         <motion.header
-            initial={{ y: -80, opacity: 0 }}
+            initial={{ y: -8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
             className={`fixed top-0 inset-x-0 z-50 transition-all duration-700 ${isScrolled
                 ? 'bg-ivory/95 backdrop-blur-xl border-b border-sand shadow-sm py-2'
                 : 'bg-transparent py-6'
@@ -56,13 +56,15 @@ export const Navbar: React.FC = () => {
                         <motion.img
                             src="/logo.jpg"
                             alt="Villa Safira"
+                            initial={{ height: 100, opacity: 0 }}
                             animate={{
                                 height: isScrolled ? 60 : 100,
-                                margin: isScrolled ? '0px 0' : '0px 0'
+                                opacity: 1,
                             }}
-                            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
                             className="w-auto object-contain rounded-full border border-sand/20 shadow-md"
                             style={{
+                                height: 100,
                                 imageRendering: 'auto',
                                 transform: 'translateZ(0)',
                                 backfaceVisibility: 'hidden'

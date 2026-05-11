@@ -21,25 +21,10 @@ html, body {
     }
 }
 
-html {
-    scroll-snap-type: y proximity;
-}
-
-@media (max-width: 768px) {
-    html {
-        scroll-snap-type: y proximity;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
     html {
-        scroll-snap-type: none;
+        scroll-behavior: auto;
     }
-}
-
-section.snap-start,
-footer.snap-start {
-    scroll-snap-align: start;
 }
 
 body {

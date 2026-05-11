@@ -9,7 +9,7 @@ export const HighlightsSection: React.FC = () => {
     return (
         <section
             id="highlights"
-            className="relative py-24 sm:py-32 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden min-h-screen snap-start scroll-mt-24"
+            className="relative pt-24 pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden h-screen snap-start flex flex-col justify-center"
         >
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
@@ -26,7 +26,7 @@ export const HighlightsSection: React.FC = () => {
 
             <div className="max-w-7xl mx-auto px-6 sm:px-12">
                 <FadeUp>
-                    <div className="sticky top-24 z-10 w-fit mb-10">
+                    <div className="w-fit mb-4">
                         <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
                             <p className="section-label text-gold/70 tracking-[0.4em]">Chapter II — The Promise</p>
                         </div>

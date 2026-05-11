@@ -16,7 +16,7 @@ export const GallerySection: React.FC = () => {
     const navigateLightbox = (index: number) => setLightbox({ open: true, index });
 
     return (
-        <section id="gallery" className="relative py-24 sm:py-32 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden min-h-screen snap-start scroll-mt-24">
+        <section id="gallery" className="relative pt-24 pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden h-screen snap-start flex flex-col justify-center">
             <motion.div
                 className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ivory to-transparent"
                 style={{ y: bandY }}
@@ -26,9 +26,9 @@ export const GallerySection: React.FC = () => {
                 style={{ y: bandY }}
             />
             {/* Heading */}
-            <div className="max-w-7xl mx-auto px-6 sm:px-12 mb-12 sm:mb-14">
+            <div className="max-w-7xl mx-auto px-6 sm:px-12 mb-6">
                 <FadeUp>
-                    <div className="sticky top-24 z-10 w-fit mb-8">
+                    <div className="w-fit mb-4">
                         <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
                             <p className="section-label text-gold/70 tracking-[0.4em]">Chapter V — The Perspective</p>
                         </div>
@@ -53,10 +53,10 @@ export const GallerySection: React.FC = () => {
             {/* Filmstrip */}
             <FadeUp>
                 <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                    <div className="grid lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+                    <div className="grid lg:grid-cols-12 gap-4 items-start">
                         <button
                             onClick={() => openLightbox(0)}
-                            className="relative lg:col-span-7 aspect-[4/3] sm:aspect-[16/10] rounded-[2.5rem] overflow-hidden border border-sand bg-white/60 shadow-2xl shadow-warmBlack/10 group focus:outline-none focus:ring-2 focus:ring-gold/60 focus:ring-offset-2 focus:ring-offset-ivory"
+                            className="relative lg:col-span-7 h-[45vh] rounded-[2.5rem] overflow-hidden border border-sand bg-white/60 shadow-2xl shadow-warmBlack/10 group focus:outline-none focus:ring-2 focus:ring-gold/60 focus:ring-offset-2 focus:ring-offset-ivory"
                             aria-label="Open gallery"
                         >
                             <motion.img
@@ -79,12 +79,12 @@ export const GallerySection: React.FC = () => {
                             </div>
                         </button>
 
-                        <div className="lg:col-span-5 grid grid-cols-2 gap-4 sm:gap-6">
-                            {GALLERY_IMAGES.slice(1, 7).map((src, idx) => (
+                        <div className="lg:col-span-5 grid grid-cols-2 gap-4">
+                            {GALLERY_IMAGES.slice(1, 5).map((src, idx) => (
                                 <button
                                     key={src}
                                     onClick={() => openLightbox(idx + 1)}
-                                    className="relative aspect-square rounded-[2rem] overflow-hidden border border-sand bg-white/60 shadow-xl shadow-warmBlack/10 group focus:outline-none focus:ring-2 focus:ring-gold/60 focus:ring-offset-2 focus:ring-offset-ivory"
+                                    className="relative h-[21vh] rounded-[2rem] overflow-hidden border border-sand bg-white/60 shadow-xl shadow-warmBlack/10 group focus:outline-none focus:ring-2 focus:ring-gold/60 focus:ring-offset-2 focus:ring-offset-ivory"
                                     aria-label={`Open gallery image ${idx + 2}`}
                                 >
                                     <img

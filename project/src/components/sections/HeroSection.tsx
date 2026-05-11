@@ -22,7 +22,7 @@ export const HeroSection: React.FC = () => {
     const heroScale = useTransform(scrollY, [0, 800], [1, enableParallax ? 1.06 : 1]);
 
     return (
-        <section id="hero" className="relative overflow-hidden min-h-screen snap-start scroll-mt-24">
+        <section id="hero" className="relative overflow-hidden h-screen snap-start">
             <motion.div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{

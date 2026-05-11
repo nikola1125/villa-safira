@@ -67,11 +67,12 @@ export const ReviewsSection: React.FC = () => {
     const fetchReviews = useCallback(async () => {
         try {
             const res = await apiClient.get('/api/reviews');
-            setReviews(res.data);
-            localStorage.setItem('reviews', JSON.stringify(res.data));
+            const data = Array.isArray(res.data) ? res.data : [];
+            setReviews(data);
+            localStorage.setItem('reviews', JSON.stringify(data));
         } catch {
             const local = JSON.parse(localStorage.getItem('reviews') || '[]');
-            setReviews(local);
+            setReviews(Array.isArray(local) ? local : []);
         }
     }, []);
 
@@ -95,11 +96,13 @@ export const ReviewsSection: React.FC = () => {
         try {
             await apiClient.post('/api/reviews', form);
             const fresh = await apiClient.get('/api/reviews');
-            setReviews(fresh.data);
-            localStorage.setItem('reviews', JSON.stringify(fresh.data));
+            const freshData = Array.isArray(fresh.data) ? fresh.data : [];
+            setReviews(freshData);
+            localStorage.setItem('reviews', JSON.stringify(freshData));
         } catch {
             const reviewToSave: Review = { ...form, date: new Date().toLocaleDateString() };
-            const updated = [reviewToSave, ...reviews];
+            const currentReviews = Array.isArray(reviews) ? reviews : [];
+            const updated = [reviewToSave, ...currentReviews];
             setReviews(updated);
             localStorage.setItem('reviews', JSON.stringify(updated));
         }
@@ -119,7 +122,7 @@ export const ReviewsSection: React.FC = () => {
         : 0;
 
     return (
-        <section id="reviews" className="relative py-24 sm:py-32 bg-gradient-to-b from-cream via-ivory to-cream overflow-hidden min-h-screen snap-start scroll-mt-24">
+        <section id="reviews" className="relative pt-24 pb-6 bg-gradient-to-b from-cream via-ivory to-cream overflow-hidden h-screen snap-start flex flex-col justify-center">
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
                 style={{
@@ -129,20 +132,20 @@ export const ReviewsSection: React.FC = () => {
                 }}
             />
             <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                <div className="grid lg:grid-cols-12 gap-12 lg:gap-14 items-start">
+                <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
                     {/* Left — sticky column */}
-                    <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-10">
+                    <div className="lg:col-span-4 space-y-4">
                         <div>
                             <FadeUp>
-                                <div className="sticky top-24 z-10 w-fit mb-8">
+                                <div className="w-fit mb-3">
                                     <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
                                         <p className="section-label text-gold tracking-[0.4em]">Chapter VI — The Voice</p>
                                     </div>
                                 </div>
                             </FadeUp>
                             <MaskReveal>
-                                <h2 className="font-serif text-4xl sm:text-5xl font-light text-warmBlack leading-tight mb-6">
+                                <h2 className="font-serif text-3xl sm:text-4xl font-light text-warmBlack leading-tight mb-3">
                                     Notes from
                                     <br />
                                     <em className="italic text-gold">our guests.</em>
@@ -154,7 +157,7 @@ export const ReviewsSection: React.FC = () => {
                         </div>
 
                         <FadeUp delay={0.18}>
-                            <div className="rounded-[2rem] bg-white/70 backdrop-blur-xl border border-sand shadow-2xl shadow-warmBlack/10 p-6 sm:p-7">
+                            <div className="rounded-[2rem] bg-white/70 backdrop-blur-xl border border-sand shadow-2xl shadow-warmBlack/10 p-4">
                                 <p className="text-[10px] tracking-[0.45em] uppercase text-warmMuted/70">Overall</p>
                                 <div className="mt-4 flex items-end justify-between gap-6">
                                     <div>
@@ -175,8 +178,8 @@ export const ReviewsSection: React.FC = () => {
 
                         {/* Review form */}
                         <FadeUp delay={0.25}>
-                            <div className="bg-white/80 backdrop-blur-xl p-7 rounded-[2rem] border border-sand/80 shadow-2xl shadow-warmBlack/10">
-                                <h4 className="font-serif text-xl text-warmBlack mb-6">Leave a note</h4>
+                            <div className="bg-white/80 backdrop-blur-xl p-5 rounded-[2rem] border border-sand/80 shadow-2xl shadow-warmBlack/10">
+                                <h4 className="font-serif text-lg text-warmBlack mb-4">Leave a note</h4>
                                 {submitted ? (
                                     <div className="py-8 text-center">
                                         <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-4">
@@ -223,7 +226,7 @@ export const ReviewsSection: React.FC = () => {
                                                 placeholder="Share your experience..."
                                                 value={form.comment}
                                                 onChange={(e) => setForm({ ...form, comment: e.target.value })}
-                                                rows={4}
+                                                rows={2}
                                                 className={inputClass('comment')}
                                                 aria-label="Your experience"
                                             />

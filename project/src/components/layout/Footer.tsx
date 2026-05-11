@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
     };
 
     return (
-        <footer id="contact" className="relative overflow-hidden bg-gradient-to-b from-cream via-navyMid to-navy text-white pt-24 pb-12 snap-start scroll-mt-24">
+        <footer id="contact" className="relative overflow-hidden bg-gradient-to-b from-cream via-navyMid to-navy text-white pt-24 pb-6 h-screen snap-start flex flex-col justify-center">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ivory via-cream/70 to-transparent" />
             <div
                 className="absolute inset-0 opacity-[0.03] pointer-events-none"

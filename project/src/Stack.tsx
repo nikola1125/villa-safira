@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import type { ReactNode } from 'react';
 
 interface CardRotateProps {
@@ -68,7 +68,12 @@ interface StackProps {
     mobileBreakpoint?: number;
 }
 
-export default function Stack({
+export interface StackHandle {
+    next: () => void;
+    prev: () => void;
+}
+
+const Stack = forwardRef<StackHandle, StackProps>(function Stack({
     randomRotation = false,
     sensitivity = 200,
     cards = [],
@@ -80,7 +85,7 @@ export default function Stack({
     pauseOnHover = false,
     mobileClickOnly = false,
     mobileBreakpoint = 768
-}: StackProps) {
+}: StackProps, ref) {
     const [isMobile, setIsMobile] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
 
@@ -125,6 +130,23 @@ export default function Stack({
             return newStack;
         });
     };
+
+    useImperativeHandle(ref, () => ({
+        next: () => setStack(prev => {
+            if (prev.length < 2) return prev;
+            const newStack = [...prev];
+            const [top] = newStack.splice(newStack.length - 1, 1);
+            newStack.unshift(top);
+            return newStack;
+        }),
+        prev: () => setStack(prev => {
+            if (prev.length < 2) return prev;
+            const newStack = [...prev];
+            const [bottom] = newStack.splice(0, 1);
+            newStack.push(bottom);
+            return newStack;
+        }),
+    }));
 
     useEffect(() => {
         if (autoplay && stack.length > 1 && !isPaused) {
@@ -177,4 +199,6 @@ export default function Stack({
             })}
         </div>
     );
-}
+});
+
+export default Stack;

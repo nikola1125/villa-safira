@@ -6,7 +6,7 @@ import { handleBookNow } from '../../utils';
 
 export const AmenitiesSection: React.FC = () => {
     return (
-        <section id="amenities" className="relative py-24 sm:py-32 bg-gradient-to-b from-cream via-ivory to-cream border-y border-sand overflow-hidden min-h-screen snap-start scroll-mt-24">
+        <section id="amenities" className="relative pt-24 pb-6 bg-gradient-to-b from-cream via-ivory to-cream border-y border-sand overflow-hidden h-screen snap-start flex flex-col justify-center">
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
                 style={{
@@ -18,14 +18,14 @@ export const AmenitiesSection: React.FC = () => {
             <div className="max-w-7xl mx-auto px-6 sm:px-12">
 
                 <FadeUp>
-                    <div className="sticky top-24 z-10 w-fit mb-10">
+                    <div className="w-fit mb-4">
                         <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
                             <p className="section-label text-gold/70 tracking-[0.4em]">Chapter IV — The Essentials</p>
                         </div>
                     </div>
                 </FadeUp>
 
-                <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-start mb-16 sm:mb-20">
+                <div className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-start mb-6">
                     <div className="lg:col-span-6">
                         <FadeUp>
                             <h2 className="font-serif text-5xl sm:text-7xl font-light text-warmBlack leading-[0.95]">
@@ -52,7 +52,7 @@ export const AmenitiesSection: React.FC = () => {
                     <FadeUp delay={0.1} className="lg:col-span-6">
                         <div className="grid grid-cols-12 gap-4 sm:gap-6">
                             <div className="col-span-7">
-                                <div className="relative aspect-[4/5] rounded-[2.25rem] overflow-hidden border border-sand shadow-2xl shadow-warmBlack/10">
+                                <div className="relative h-[38vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-2xl shadow-warmBlack/10">
                                     <motion.img
                                         src="./kuzhin.jpg"
                                         alt="Shared kitchen and breakfast area"
@@ -64,10 +64,10 @@ export const AmenitiesSection: React.FC = () => {
                                 </div>
                             </div>
                             <div className="col-span-5 flex flex-col gap-4 sm:gap-6">
-                                <div className="relative aspect-square rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
+                                <div className="relative h-[17vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
                                     <img src="./kuzhin77.jpg" alt="Breakfast details" loading="lazy" className="w-full h-full object-cover" />
                                 </div>
-                                <div className="relative aspect-square rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
+                                <div className="relative h-[17vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
                                     <img src="./kuzhin78.jpg" alt="Guest amenities" loading="lazy" className="w-full h-full object-cover" />
                                 </div>
                             </div>

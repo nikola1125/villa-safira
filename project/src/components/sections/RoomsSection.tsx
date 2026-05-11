@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { ArrowUpRight, Check, Images } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Images } from 'lucide-react';
 import { FadeUp } from '../ui/FadeUp';
 import { MaskReveal } from '../ui/MaskReveal';
 import { Lightbox } from '../ui/Lightbox';
 import { ROOMS } from '../../data';
 import { handleBookNow } from '../../utils';
-import Stack from '../../Stack';
+import Stack, { type StackHandle } from '../../Stack';
 
 export const RoomsSection: React.FC = () => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -26,16 +26,22 @@ export const RoomsSection: React.FC = () => {
     const closeLightbox = () => setLightbox((prev) => ({ ...prev, open: false }));
     const navigateLightbox = (index: number) => setLightbox((prev) => ({ ...prev, index }));
 
+    const stackRef = useRef<StackHandle>(null);
     const activeRoom = ROOMS[Math.min(Math.max(activeIndex, 0), ROOMS.length - 1)];
 
     const cards = useMemo(() => {
-        return ROOMS.map((room, i) => (
+        return ROOMS.map((room, i) => {
+            let downX = 0, downY = 0;
+            return (
             <div key={room.title} className="relative w-full h-full">
-                <button
-                    type="button"
-                    onClick={() => openLightbox(room.images, 0)}
-                    className="group relative w-full h-full rounded-[2rem] overflow-hidden border border-sand bg-white/60 backdrop-blur-xl shadow-2xl shadow-warmBlack/10 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:ring-offset-2 focus:ring-offset-ivory"
+                <div
+                    className="group relative w-full h-full rounded-[2rem] overflow-hidden border border-sand bg-white/60 backdrop-blur-xl shadow-2xl shadow-warmBlack/10 cursor-pointer"
                     aria-label={`Open ${room.title} gallery`}
+                    onPointerDown={(e) => { downX = e.clientX; downY = e.clientY; }}
+                    onPointerUp={(e) => {
+                        const dist = Math.hypot(e.clientX - downX, e.clientY - downY);
+                        if (dist < 8) openLightbox(room.images, 0);
+                    }}
                 >
                     <img
                         src={room.img}
@@ -63,13 +69,14 @@ export const RoomsSection: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                </button>
+                </div>
             </div>
-        ));
+            );
+        });
     }, []);
 
     return (
-        <section id="rooms" className="relative py-32 sm:py-48 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden min-h-screen snap-start scroll-mt-24">
+        <section id="rooms" className="relative pt-24 pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden h-screen snap-start flex flex-col justify-center">
             <motion.div
                 className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ivory to-transparent"
                 style={{ y: bandY }}
@@ -81,33 +88,33 @@ export const RoomsSection: React.FC = () => {
             <div className="max-w-7xl mx-auto px-6 sm:px-12">
 
                 <FadeUp>
-                    <div className="sticky top-24 z-10 w-fit mb-10">
+                    <div className="w-fit mb-4">
                         <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
                             <p className="section-label text-gold/70 tracking-[0.4em]">Chapter III — The Sanctuary</p>
                         </div>
                     </div>
                 </FadeUp>
 
-                <div className="mb-20">
+                <div className="mb-3">
                     <MaskReveal>
-                        <h2 className="font-serif text-5xl sm:text-7xl lg:text-8xl font-light text-warmBlack leading-none mb-6">
+                        <h2 className="font-serif text-4xl sm:text-5xl font-light text-warmBlack leading-none mb-2">
                             Choose your<br />
                             <em className="italic text-gold">Room.</em>
                         </h2>
                     </MaskReveal>
                     <FadeUp delay={0.2}>
-                        <p className="text-warmMuted text-lg sm:text-xl max-w-2xl font-light leading-relaxed">
-                            Drag or tap through the stack to explore each room. Details update instantly — book the one that
-                            fits your stay.
+                        <p className="text-warmMuted text-sm sm:text-base max-w-2xl font-light leading-relaxed">
+                            Drag or tap through the stack to explore each room.
                         </p>
                     </FadeUp>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+                <div className="grid lg:grid-cols-2 gap-10 lg:gap-24 items-start">
                     <FadeUp>
-                        <div className="relative">
-                            <div className="relative w-full max-w-xl mx-auto lg:mx-0 aspect-[4/5]">
+                        <div className="relative group">
+                            <div className="relative w-full max-w-xl mx-auto lg:mx-0 h-[62vh] outline-none focus:outline-none [&_*]:outline-none">
                                 <Stack
+                                    ref={stackRef}
                                     cards={cards}
                                     sensitivity={140}
                                     randomRotation
@@ -117,16 +124,34 @@ export const RoomsSection: React.FC = () => {
                                     animationConfig={{ stiffness: 240, damping: 22 }}
                                 />
                             </div>
-                            <p className="mt-6 text-warmMuted/70 text-[10px] tracking-[0.3em] uppercase text-center lg:text-left">
-                                Tip: drag the card to switch rooms · tap to open gallery
-                            </p>
+                            <div className="hidden lg:flex items-center justify-between mt-4">
+                                <p className="text-warmMuted/70 text-[10px] tracking-[0.3em] uppercase">
+                                    Tap image to open gallery
+                                </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => stackRef.current?.prev()}
+                                        className="w-9 h-9 rounded-full border border-sand bg-white/70 backdrop-blur-sm flex items-center justify-center text-warmMuted hover:border-gold/50 hover:text-gold transition-all duration-200"
+                                        aria-label="Previous room"
+                                    >
+                                        <ArrowLeft className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => stackRef.current?.next()}
+                                        className="w-9 h-9 rounded-full border border-sand bg-white/70 backdrop-blur-sm flex items-center justify-center text-warmMuted hover:border-gold/50 hover:text-gold transition-all duration-200"
+                                        aria-label="Next room"
+                                    >
+                                        <ArrowRight className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </FadeUp>
 
                     <FadeUp delay={0.1}>
-                        <div className="lg:sticky lg:top-28">
-                            <div className="bg-white/70 border border-sand rounded-[2rem] backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden">
-                                <div className="p-7 sm:p-10">
+                        <div className="pl-2 -mt-10">
+                            <div className="bg-white/70 border border-sand rounded-[2rem] backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden min-h-[72vh] flex flex-col">
+                                <div className="p-5 sm:p-6 flex flex-col flex-1">
                                     <div className="flex items-start justify-between gap-6">
                                         <div>
                                             <p className="section-label text-gold/70">Selected</p>
@@ -146,7 +171,7 @@ export const RoomsSection: React.FC = () => {
                                         {activeRoom?.desc}
                                     </p>
 
-                                    <div className="mt-8 flex flex-wrap gap-2">
+                                    <div className="mt-3 flex flex-wrap gap-2">
                                         {activeRoom?.highlights.map((h) => (
                                             <span
                                                 key={h}
@@ -158,7 +183,7 @@ export const RoomsSection: React.FC = () => {
                                         ))}
                                     </div>
 
-                                    <div className="mt-9 flex flex-col sm:flex-row gap-4">
+                                    <div className="mt-4 flex flex-col sm:flex-row gap-3">
                                         <button
                                             onClick={handleBookNow}
                                             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-navy text-white rounded-full text-xs tracking-[0.25em] uppercase font-semibold hover:bg-navyMid transition-all duration-300"
@@ -175,7 +200,7 @@ export const RoomsSection: React.FC = () => {
                                         </button>
                                     </div>
 
-                                    <div className="mt-10 pt-8 border-t border-sand/80">
+                                    <div className="mt-auto pt-4 border-t border-sand/80">
                                         <p className="text-[10px] tracking-[0.3em] uppercase text-warmMuted/70">Quick shots</p>
                                         <div className="mt-4 grid grid-cols-4 gap-3">
                                             {(activeRoom?.images ?? []).slice(0, 4).map((img, idx) => (
