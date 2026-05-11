@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUpRight, CalendarCheck2, ShieldCheck, Sparkles, Star } from 'lucide-react';
 import { FadeUp } from '../ui/FadeUp';
 import { MaskReveal } from '../ui/MaskReveal';
-import { handleBookNow, openWhatsApp, scrollToSection } from '../../utils';
+import { handleBookNow, openWhatsApp } from '../../utils';
 
 export const FinalCtaSection: React.FC = () => {
     return (
@@ -19,9 +19,8 @@ export const FinalCtaSection: React.FC = () => {
                 }}
             />
 
-            <div className="max-w-7xl mx-auto px-6 sm:px-12 h-full">
-                <div className="h-full flex items-center">
-                    <div className="w-full">
+            <div className="max-w-7xl mx-auto px-6 sm:px-12">
+                <div>
                         <FadeUp>
                             <div className="w-fit mb-4">
                                 <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
@@ -90,21 +89,10 @@ export const FinalCtaSection: React.FC = () => {
                                         </div>
                                     </FadeUp>
 
-                                    <FadeUp delay={0.6}>
-                                        <div className="mt-9 text-[10px] tracking-[0.3em] uppercase text-warmMuted/70">
-                                            Want one last look?
-                                            <button
-                                                onClick={() => scrollToSection('gallery')}
-                                                className="ml-3 text-gold hover:text-goldDark transition-colors"
-                                            >
-                                                Open the Gallery
-                                            </button>
-                                        </div>
-                                    </FadeUp>
                                 </div>
 
-                                <FadeUp delay={0.2}>
-                                    <div className="lg:col-span-5">
+                                <FadeUp delay={0.2} className="lg:col-span-5">
+                                    <div>
                                         <div className="rounded-[2.25rem] bg-navy text-white border border-white/5 p-8 sm:p-10 shadow-2xl shadow-navy/15">
                                             <div className="w-11 h-11 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center mb-6 text-gold">
                                                 <Sparkles className="w-5 h-5" strokeWidth={1.5} />
@@ -128,7 +116,6 @@ export const FinalCtaSection: React.FC = () => {
                                 </FadeUp>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </section>

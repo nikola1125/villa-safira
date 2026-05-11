@@ -8,9 +8,9 @@ export const Navbar: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
-        const onScroll = () => setIsScrolled(window.scrollY > 60);
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
+        const onSectionChange = (e: Event) => setIsScrolled((e as CustomEvent).detail > 0);
+        window.addEventListener('section-change', onSectionChange);
+        return () => window.removeEventListener('section-change', onSectionChange);
     }, []);
 
     const handleNav = (id: string) => {

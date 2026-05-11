@@ -57,7 +57,7 @@ export const StorySection: React.FC = () => {
                     <FadeUp delay={0.1} className="lg:col-span-6">
                         <div className="grid grid-cols-12 gap-4 sm:gap-6">
                             <div className="col-span-7">
-                                <div className="relative h-[44vh] rounded-[2.25rem] overflow-hidden shadow-2xl shadow-warmBlack/10">
+                                <div className="relative h-[58vh] rounded-[2.25rem] overflow-hidden shadow-2xl shadow-warmBlack/10">
                                     <motion.img
                                         src="./jasht1.jpg"
                                         alt="Villa Safira — outdoor terrace"
@@ -70,7 +70,7 @@ export const StorySection: React.FC = () => {
                                 </div>
                             </div>
                             <div className="col-span-5 flex flex-col gap-4 sm:gap-6">
-                                <div className="relative h-[20vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
+                                <div className="relative h-[27vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
                                     <img
                                         src="./dhome7.jpg"
                                         alt="Villa Safira — warm interior"
@@ -78,7 +78,7 @@ export const StorySection: React.FC = () => {
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
-                                <div className="relative h-[18vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
+                                <div className="relative h-[26vh] rounded-[2.25rem] overflow-hidden border border-sand shadow-xl shadow-warmBlack/10">
                                     <img
                                         src="./jasht2.jpg"
                                         alt="Garden view"

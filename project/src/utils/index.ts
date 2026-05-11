@@ -9,7 +9,5 @@ export const openWhatsApp = (): void => {
 };
 
 export const scrollToSection = (id: string): void => {
-    setTimeout(() => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    }, 50);
+    window.dispatchEvent(new CustomEvent('navigate-to', { detail: id }));
 };

@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import type { AmenityItem, Room } from '../types';
 
-export const NAV_LINKS = ['highlights', 'story', 'rooms', 'amenities', 'gallery', 'reviews', 'cta'] as const;
+export const NAV_LINKS = ['highlights', 'story', 'rooms', 'amenities', 'reviews', 'cta'] as const;
 export type NavLink = typeof NAV_LINKS[number];
 
 export const ROOMS: Room[] = [
