@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, startTransition } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Images } from 'lucide-react';
 import { FadeUp } from '../ui/FadeUp';
@@ -16,8 +16,9 @@ export const RoomsSection: React.FC = () => {
         index: 0,
     });
 
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
     const { scrollY } = useScroll();
-    const bandY = useTransform(scrollY, [0, 900], [0, 40]);
+    const bandY = useTransform(scrollY, [0, 900], isMobile ? [0, 0] : [0, 40]);
 
     const openLightbox = (roomImages: string[], index: number) => {
         setLightbox({ open: true, images: roomImages, index });
@@ -119,8 +120,9 @@ export const RoomsSection: React.FC = () => {
                                     sensitivity={140}
                                     randomRotation
                                     sendToBackOnClick
-                                    onActiveChange={setActiveIndex}
-                                    animationConfig={{ stiffness: 400, damping: 40 }}
+                                    mobileDragOnly
+                                    onActiveChange={(i) => startTransition(() => setActiveIndex(i))}
+                                    animationConfig={{ stiffness: 460, damping: 42 }}
                                 />
                             </div>
                             <div className="flex items-center justify-between mt-4">

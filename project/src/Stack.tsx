@@ -7,6 +7,7 @@ interface CardRotateProps {
     onSendToBack: () => void;
     sensitivity: number;
     disableDrag?: boolean;
+    isMobile?: boolean;
 }
 
 interface DragInfo {
@@ -16,7 +17,7 @@ interface DragInfo {
     };
 }
 
-function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }: CardRotateProps) {
+function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false, isMobile = false }: CardRotateProps) {
     const x = useMotionValue(0);
     const y = useMotionValue(0);
     const rotateX = useTransform(y, [-100, 100], [60, -60]);
@@ -24,7 +25,9 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }
 
     function handleDragEnd(_: unknown, info: DragInfo) {
         if (Math.abs(info.offset.x) > sensitivity || Math.abs(info.offset.y) > sensitivity) {
-            onSendToBack();
+            x.set(0);
+            y.set(0);
+            requestAnimationFrame(() => onSendToBack());
         }
     }
 
@@ -39,7 +42,7 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }
     return (
         <motion.div
             className="absolute inset-0 cursor-grab"
-            style={{ x, y, rotateX, rotateY }}
+            style={{ x, y, rotateX, rotateY, ...(isMobile && { willChange: 'transform' }) }}
             drag
             dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
             dragElastic={0.65}
@@ -64,6 +67,7 @@ interface StackProps {
     autoplayDelay?: number;
     pauseOnHover?: boolean;
     mobileClickOnly?: boolean;
+    mobileDragOnly?: boolean;
     mobileBreakpoint?: number;
 }
 
@@ -83,6 +87,7 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
     autoplayDelay = 3000,
     pauseOnHover = false,
     mobileClickOnly = false,
+    mobileDragOnly = false,
     mobileBreakpoint = 768
 }: StackProps, ref) {
     const [isMobile, setIsMobile] = useState(false);
@@ -98,7 +103,7 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
         return () => window.removeEventListener('resize', checkMobile);
     }, [mobileBreakpoint]);
 
-    const shouldDisableDrag = mobileClickOnly && isMobile;
+    const shouldDisableDrag = (mobileClickOnly && isMobile) || (mobileDragOnly && !isMobile);
     const shouldEnableClick = sendToBackOnClick || shouldDisableDrag;
 
     const [stack, setStack] = useState<{ id: number; content: ReactNode }[]>(() => {
@@ -170,7 +175,7 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
         <div
             className="relative w-full h-full"
             style={{
-                perspective: 600
+                perspective: 900
             }}
             onMouseEnter={() => pauseOnHover && setIsPaused(true)}
             onMouseLeave={() => pauseOnHover && setIsPaused(false)}
@@ -183,10 +188,11 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
                         onSendToBack={() => sendToBack(card.id)}
                         sensitivity={sensitivity}
                         disableDrag={shouldDisableDrag}
+                        isMobile={isMobile}
                     >
                         <motion.div
                             className="rounded-2xl overflow-hidden w-full h-full"
-                            style={{ transformOrigin: '90% 90%' }}
+                            style={{ transformOrigin: '90% 90%', ...(isMobile && { willChange: 'transform' }) }}
                             onClick={() => shouldEnableClick && sendToBack(card.id)}
                             animate={{
                                 rotateZ: (stack.length - index - 1) * 4 + rotationVal,
