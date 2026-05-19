@@ -30,6 +30,37 @@ export const RoomsSection: React.FC = () => {
     const stackRef = useRef<StackHandle>(null);
     const activeRoom = ROOMS[Math.min(Math.max(activeIndex, 0), ROOMS.length - 1)];
 
+    const cardBacks = useMemo(() =>
+        ROOMS.map((room) => (
+            <div key={room.title} className="w-full h-full bg-white/95 backdrop-blur-xl flex flex-col p-5 overflow-y-auto">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                        <p className="text-[10px] tracking-[0.35em] uppercase text-gold/70">Room Details</p>
+                        <h3 className="font-serif text-2xl text-warmBlack leading-tight mt-1">{room.title}</h3>
+                    </div>
+                    <p className="font-serif text-3xl text-gold/60 leading-none flex-shrink-0">{String(ROOMS.indexOf(room) + 1).padStart(2, '0')}</p>
+                </div>
+                <p className="text-warmMuted text-sm leading-relaxed">{room.desc}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                    {room.highlights.map((h) => (
+                        <span key={h} className="inline-flex items-center gap-1.5 text-[10px] tracking-widest uppercase text-warmMuted border border-sand px-2.5 py-1 rounded-full">
+                            <Check className="w-2.5 h-2.5 text-gold" />{h}
+                        </span>
+                    ))}
+                </div>
+                <div className="mt-4 flex flex-col gap-2">
+                    <button onClick={handleBookNow} className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-navy text-white rounded-full text-xs tracking-[0.25em] uppercase font-semibold">
+                        Book this room <ArrowUpRight className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => openLightbox(room.images, 0)} className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gold/30 text-gold rounded-full text-xs tracking-[0.25em] uppercase font-semibold">
+                        View gallery <Images className="w-4 h-4" />
+                    </button>
+                </div>
+                <p className="mt-auto pt-3 text-center text-[9px] tracking-[0.3em] uppercase text-warmMuted/40">Swipe left / right to flip back</p>
+            </div>
+        )),
+    [openLightbox]);
+
     const cards = useMemo(() => {
         return ROOMS.map((room, i) => {
             let downX = 0, downY = 0;
@@ -110,13 +141,39 @@ export const RoomsSection: React.FC = () => {
                     </FadeUp>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-10 lg:gap-24 items-start">
+                {/* ── Mobile: unified single card ── */}
+                <FadeUp className="lg:hidden -mx-6 mb-10">
+                    <div className="relative h-[50vh] pt-6 outline-none focus:outline-none [&_*]:outline-none">
+                        <Stack
+                            ref={stackRef}
+                            cards={cards}
+                            cardBacks={cardBacks}
+                            sensitivity={80}
+                            randomRotation
+                            sendToBackOnClick
+                            mobileDragOnly
+                            onActiveChange={(i) => startTransition(() => setActiveIndex(i))}
+                            animationConfig={{ stiffness: 460, damping: 42 }}
+                        />
+                        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
+                            <p className="text-white/70 text-[10px] tracking-[0.3em] uppercase drop-shadow">Swipe to explore</p>
+                            <div className="flex gap-2">
+                                <button onClick={() => stackRef.current?.prev()} className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm border border-white/30 flex items-center justify-center text-warmMuted hover:bg-white hover:text-gold transition-all duration-200" aria-label="Previous room"><ArrowLeft className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => stackRef.current?.next()} className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm border border-white/30 flex items-center justify-center text-warmMuted hover:bg-white hover:text-gold transition-all duration-200" aria-label="Next room"><ArrowRight className="w-3.5 h-3.5" /></button>
+                            </div>
+                        </div>
+                    </div>
+                </FadeUp>
+
+                {/* ── Desktop: original two-column layout ── */}
+                <div className="hidden lg:grid lg:grid-cols-2 gap-10 lg:gap-24 items-start">
                     <FadeUp>
                         <div className="relative group">
-                            <div className="relative w-full max-w-xl mx-auto lg:mx-0 h-[52vh] sm:h-[62vh] pr-8 md:pr-0 outline-none focus:outline-none [&_*]:outline-none">
+                            <div className="relative w-full max-w-xl mx-auto lg:mx-0 h-[62vh] outline-none focus:outline-none [&_*]:outline-none">
                                 <Stack
                                     ref={stackRef}
                                     cards={cards}
+                                    cardBacks={cardBacks}
                                     sensitivity={140}
                                     randomRotation
                                     sendToBackOnClick
@@ -126,93 +183,45 @@ export const RoomsSection: React.FC = () => {
                                 />
                             </div>
                             <div className="flex items-center justify-between mt-4">
-                                <p className="text-warmMuted/70 text-[10px] tracking-[0.3em] uppercase">
-                                    <span className="md:hidden">Swipe to explore rooms</span>
-                                    <span className="hidden md:inline">Tap image to open gallery</span>
-                                </p>
+                                <p className="text-warmMuted/70 text-[10px] tracking-[0.3em] uppercase">Tap image to open gallery</p>
                                 <div className="flex gap-2">
-                                    <button
-                                        onClick={() => stackRef.current?.prev()}
-                                        className="w-9 h-9 rounded-full border border-sand bg-white/70 backdrop-blur-sm flex items-center justify-center text-warmMuted hover:border-gold/50 hover:text-gold transition-all duration-200"
-                                        aria-label="Previous room"
-                                    >
-                                        <ArrowLeft className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => stackRef.current?.next()}
-                                        className="w-9 h-9 rounded-full border border-sand bg-white/70 backdrop-blur-sm flex items-center justify-center text-warmMuted hover:border-gold/50 hover:text-gold transition-all duration-200"
-                                        aria-label="Next room"
-                                    >
-                                        <ArrowRight className="w-4 h-4" />
-                                    </button>
+                                    <button onClick={() => stackRef.current?.prev()} className="w-9 h-9 rounded-full border border-sand bg-white/70 backdrop-blur-sm flex items-center justify-center text-warmMuted hover:border-gold/50 hover:text-gold transition-all duration-200" aria-label="Previous room"><ArrowLeft className="w-4 h-4" /></button>
+                                    <button onClick={() => stackRef.current?.next()} className="w-9 h-9 rounded-full border border-sand bg-white/70 backdrop-blur-sm flex items-center justify-center text-warmMuted hover:border-gold/50 hover:text-gold transition-all duration-200" aria-label="Next room"><ArrowRight className="w-4 h-4" /></button>
                                 </div>
                             </div>
                         </div>
                     </FadeUp>
-
                     <FadeUp delay={0.1}>
-                        <div className="pl-2 md:-mt-10">
-                            <div className="bg-white/70 border border-sand rounded-[2rem] backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden md:min-h-[72vh] flex flex-col">
+                        <div className="pl-2 -mt-10">
+                            <div className="bg-white/70 border border-sand rounded-[2rem] backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden min-h-[72vh] flex flex-col">
                                 <div className="p-5 sm:p-6 flex flex-col flex-1">
                                     <div className="flex items-start justify-between gap-6">
                                         <div>
                                             <p className="section-label text-gold/70">Selected</p>
-                                            <h3 className="font-serif text-3xl sm:text-4xl text-warmBlack leading-tight mt-3">
-                                                {activeRoom?.title}
-                                            </h3>
+                                            <h3 className="font-serif text-3xl sm:text-4xl text-warmBlack leading-tight mt-3">{activeRoom?.title}</h3>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-[10px] tracking-[0.35em] uppercase text-warmMuted/70">Room</p>
-                                            <p className="font-serif text-2xl text-gold mt-2">
-                                                {String(activeIndex + 1).padStart(2, '0')}
-                                            </p>
+                                            <p className="font-serif text-2xl text-gold mt-2">{String(activeIndex + 1).padStart(2, '0')}</p>
                                         </div>
                                     </div>
-
-                                    <p className="mt-6 text-warmMuted text-base sm:text-lg leading-loose">
-                                        {activeRoom?.desc}
-                                    </p>
-
+                                    <p className="mt-6 text-warmMuted text-base sm:text-lg leading-loose">{activeRoom?.desc}</p>
                                     <div className="mt-3 flex flex-wrap gap-2">
                                         {activeRoom?.highlights.map((h) => (
-                                            <span
-                                                key={h}
-                                                className="inline-flex items-center gap-2 text-[10px] tracking-widest uppercase text-warmMuted border border-sand px-3 py-2 rounded-full"
-                                            >
-                                                <Check className="w-3 h-3 text-gold" />
-                                                {h}
+                                            <span key={h} className="inline-flex items-center gap-2 text-[10px] tracking-widest uppercase text-warmMuted border border-sand px-3 py-2 rounded-full">
+                                                <Check className="w-3 h-3 text-gold" />{h}
                                             </span>
                                         ))}
                                     </div>
-
                                     <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                                        <button
-                                            onClick={handleBookNow}
-                                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-navy text-white rounded-full text-xs tracking-[0.25em] uppercase font-semibold hover:bg-navyMid transition-all duration-300"
-                                        >
-                                            Book this room
-                                            <ArrowUpRight className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                            onClick={() => openLightbox(activeRoom?.images ?? [], 0)}
-                                            className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-gold/30 text-gold rounded-full text-xs tracking-[0.25em] uppercase font-semibold hover:bg-gold hover:text-white hover:border-gold transition-all duration-300"
-                                        >
-                                            View gallery
-                                            <Images className="w-4 h-4" />
-                                        </button>
+                                        <button onClick={handleBookNow} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-navy text-white rounded-full text-xs tracking-[0.25em] uppercase font-semibold hover:bg-navyMid transition-all duration-300">Book this room <ArrowUpRight className="w-4 h-4" /></button>
+                                        <button onClick={() => openLightbox(activeRoom?.images ?? [], 0)} className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-gold/30 text-gold rounded-full text-xs tracking-[0.25em] uppercase font-semibold hover:bg-gold hover:text-white hover:border-gold transition-all duration-300">View gallery <Images className="w-4 h-4" /></button>
                                     </div>
-
                                     <div className="mt-auto pt-4 border-t border-sand/80">
                                         <p className="text-[10px] tracking-[0.3em] uppercase text-warmMuted/70">Quick shots</p>
                                         <div className="mt-4 grid grid-cols-4 gap-3">
                                             {(activeRoom?.images ?? []).slice(0, 4).map((img, idx) => (
-                                                <button
-                                                    key={img}
-                                                    type="button"
-                                                    onClick={() => openLightbox(activeRoom.images, idx)}
-                                                    className="relative aspect-square rounded-2xl overflow-hidden border border-sand hover:border-gold/40 transition-colors focus:outline-none focus:ring-2 focus:ring-gold/50 focus:ring-offset-2 focus:ring-offset-ivory"
-                                                    aria-label={`Open image ${idx + 1} for ${activeRoom.title}`}
-                                                >
+                                                <button key={img} type="button" onClick={() => openLightbox(activeRoom.images, idx)} className="relative aspect-square rounded-2xl overflow-hidden border border-sand hover:border-gold/40 transition-colors focus:outline-none focus:ring-2 focus:ring-gold/50 focus:ring-offset-2 focus:ring-offset-ivory" aria-label={`Open image ${idx + 1} for ${activeRoom.title}`}>
                                                     <img src={img} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                                 </button>
                                             ))}

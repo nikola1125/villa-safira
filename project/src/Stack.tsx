@@ -4,10 +4,12 @@ import type { ReactNode } from 'react';
 
 interface CardRotateProps {
     children: ReactNode;
+    backContent?: ReactNode;
     onSendToBack: () => void;
     sensitivity: number;
     disableDrag?: boolean;
     isMobile?: boolean;
+    startFlipped?: boolean;
 }
 
 interface DragInfo {
@@ -17,23 +19,33 @@ interface DragInfo {
     };
 }
 
-function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false, isMobile = false }: CardRotateProps) {
+function CardRotate({ children, backContent, onSendToBack, sensitivity, disableDrag = false, isMobile = false, startFlipped = false }: CardRotateProps) {
+    const [isFlipped, setIsFlipped] = useState(startFlipped);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
     const rotateX = useTransform(y, [-100, 100], [60, -60]);
     const rotateY = useTransform(x, [-100, 100], [-60, 60]);
 
     function handleDragEnd(_: unknown, info: DragInfo) {
-        if (Math.abs(info.offset.x) > sensitivity || Math.abs(info.offset.y) > sensitivity) {
+        const absX = Math.abs(info.offset.x);
+        const absY = Math.abs(info.offset.y);
+        if (absX > sensitivity || absY > sensitivity) {
             x.set(0);
             y.set(0);
-            requestAnimationFrame(() => onSendToBack());
+            if (backContent && absX >= absY) {
+                // Horizontal → flip card
+                setIsFlipped(prev => !prev);
+            } else {
+                // Vertical → cycle to next room
+                setIsFlipped(false);
+                requestAnimationFrame(() => onSendToBack());
+            }
         }
     }
 
     if (disableDrag) {
         return (
-            <motion.div className="absolute inset-0 cursor-pointer" style={{ x: 0, y: 0 }}>
+            <motion.div className={`absolute ${isMobile ? 'inset-8' : 'inset-0'} cursor-pointer`} style={{ x: 0, y: 0 }}>
                 {children}
             </motion.div>
         );
@@ -41,8 +53,8 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false, 
 
     return (
         <motion.div
-            className="absolute inset-0 cursor-grab"
-            style={{ x, y, rotateX, rotateY, ...(isMobile && { willChange: 'transform' }) }}
+            className={`absolute ${isMobile ? 'inset-8' : 'inset-0'} cursor-grab`}
+            style={{ x, y, rotateX, rotateY, touchAction: 'none', ...(isMobile && { willChange: 'transform' }) }}
             drag
             dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
             dragElastic={0.65}
@@ -51,7 +63,25 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false, 
             whileTap={{ cursor: 'grabbing' }}
             onDragEnd={handleDragEnd}
         >
-            {children}
+            {backContent ? (
+                <div className="w-full h-full" style={{ perspective: '1200px' }}>
+                    <motion.div
+                        className="w-full h-full relative"
+                        style={{ transformStyle: 'preserve-3d', ...(isMobile && { willChange: 'transform' }) }}
+                        animate={{ rotateY: isFlipped ? 180 : 0 }}
+                        transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                    >
+                        <div className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
+                            {children}
+                        </div>
+                        <div className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                            {backContent}
+                        </div>
+                    </motion.div>
+                </div>
+            ) : (
+                children
+            )}
         </motion.div>
     );
 }
@@ -60,6 +90,8 @@ interface StackProps {
     randomRotation?: boolean;
     sensitivity?: number;
     cards?: ReactNode[];
+    cardBacks?: ReactNode[];
+    startFlipped?: boolean;
     animationConfig?: { stiffness: number; damping: number };
     sendToBackOnClick?: boolean;
     onActiveChange?: (index: number) => void;
@@ -80,6 +112,8 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
     randomRotation = false,
     sensitivity = 200,
     cards = [],
+    cardBacks,
+    startFlipped = false,
     animationConfig = { stiffness: 260, damping: 20 },
     sendToBackOnClick = false,
     onActiveChange,
@@ -106,8 +140,8 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
     const shouldDisableDrag = (mobileClickOnly && isMobile) || (mobileDragOnly && !isMobile);
     const shouldEnableClick = sendToBackOnClick || shouldDisableDrag;
 
-    const [stack, setStack] = useState<{ id: number; content: ReactNode }[]>(() => {
-        return cards.map((content, index) => ({ id: index + 1, content }));
+    const [stack, setStack] = useState<{ id: number; content: ReactNode; back?: ReactNode }[]>(() => {
+        return cards.map((content, index) => ({ id: index + 1, content, back: cardBacks?.[index] }));
     });
 
     const rotationsRef = useRef<Map<number, number>>(new Map());
@@ -120,9 +154,9 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
 
     useEffect(() => {
         if (cards.length) {
-            setStack(cards.map((content, index) => ({ id: index + 1, content })));
+            setStack(cards.map((content, index) => ({ id: index + 1, content, back: cardBacks?.[index] })));
         }
-    }, [cards]);
+    }, [cards, cardBacks]);
 
     useEffect(() => {
         if (!onActiveChange) return;
@@ -160,6 +194,16 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
         }),
     }));
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el || !isMobile) return;
+        const preventScroll = (e: TouchEvent) => e.preventDefault();
+        el.addEventListener('touchmove', preventScroll, { passive: false });
+        return () => el.removeEventListener('touchmove', preventScroll);
+    }, [isMobile]);
+
     useEffect(() => {
         if (autoplay && stack.length > 1 && !isPaused) {
             const interval = setInterval(() => {
@@ -173,6 +217,7 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
 
     return (
         <div
+            ref={containerRef}
             className="relative w-full h-full"
             style={{
                 perspective: 900
@@ -185,17 +230,19 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
                 return (
                     <CardRotate
                         key={card.id}
+                        backContent={card.back}
                         onSendToBack={() => sendToBack(card.id)}
                         sensitivity={sensitivity}
                         disableDrag={shouldDisableDrag}
                         isMobile={isMobile}
+                        startFlipped={startFlipped}
                     >
                         <motion.div
                             className="rounded-2xl overflow-hidden w-full h-full"
-                            style={{ transformOrigin: '90% 90%', ...(isMobile && { willChange: 'transform' }) }}
+                            style={{ transformOrigin: '50% 90%', ...(isMobile && { willChange: 'transform' }) }}
                             onClick={() => shouldEnableClick && sendToBack(card.id)}
                             animate={{
-                                rotateZ: (stack.length - index - 1) * 4 + rotationVal,
+                                rotateZ: (stack.length - index - 1) * (isMobile ? 6 : 4) + rotationVal,
                                 scale: 1 + index * 0.06 - stack.length * 0.06,
                             }}
                             initial={false}
