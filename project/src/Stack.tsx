@@ -13,10 +13,7 @@ interface CardRotateProps {
 }
 
 interface DragInfo {
-    offset: {
-        x: number;
-        y: number;
-    };
+    velocity: { x: number; y: number };
 }
 
 function CardRotate({ children, backContent, onSendToBack, sensitivity, disableDrag = false, isMobile = false, startFlipped = false }: CardRotateProps) {
@@ -26,26 +23,41 @@ function CardRotate({ children, backContent, onSendToBack, sensitivity, disableD
     const rotateX = useTransform(y, [-100, 100], [60, -60]);
     const rotateY = useTransform(x, [-100, 100], [-60, 60]);
 
-    function handleDragEnd(_: unknown, info: DragInfo) {
-        const absX = Math.abs(info.offset.x);
-        const absY = Math.abs(info.offset.y);
-        if (absX > sensitivity || absY > sensitivity) {
-            x.set(0);
-            y.set(0);
-            if (backContent && absX >= absY) {
-                // Horizontal → flip card
-                setIsFlipped(prev => !prev);
-            } else {
-                // Vertical → cycle to next room
-                setIsFlipped(false);
-                requestAnimationFrame(() => onSendToBack());
-            }
+    // Store raw clientX/Y on pointer-down so we can compute true finger travel
+    // in onDragEnd (info.offset is elastic-constrained, not the real pointer delta).
+    const dragStart = useRef({ x: 0, y: 0 });
+
+    function handleDragEnd(event: unknown, info: DragInfo) {
+        // Use the raw PointerEvent coords — same reference frame as dragStart
+        const pe = event as PointerEvent;
+        const rawDx = pe.clientX - dragStart.current.x;
+        const rawDy = pe.clientY - dragStart.current.y;
+        const absX = Math.abs(rawDx);
+        const absY = Math.abs(rawDy);
+        const velX = Math.abs(info.velocity.x);
+        const velY = Math.abs(info.velocity.y);
+
+        // Trigger on real movement OR a quick flick (velocity)
+        const triggered = absX > sensitivity || absY > sensitivity || velX > 150 || velY > 150;
+        if (!triggered) { x.set(0); y.set(0); return; }
+
+        x.set(0);
+        y.set(0);
+
+        const isHorizontal = absX > absY;
+        if (backContent && isHorizontal) {
+            // Left / right → flip card front ↔ back
+            setIsFlipped(prev => !prev);
+        } else {
+            // Up / down → cycle to next room
+            setIsFlipped(false);
+            onSendToBack();
         }
     }
 
     if (disableDrag) {
         return (
-            <motion.div className={`absolute ${isMobile ? 'inset-8' : 'inset-0'} cursor-pointer`} style={{ x: 0, y: 0 }}>
+            <motion.div className="absolute inset-0 cursor-pointer" style={{ x: 0, y: 0 }}>
                 {children}
             </motion.div>
         );
@@ -53,14 +65,15 @@ function CardRotate({ children, backContent, onSendToBack, sensitivity, disableD
 
     return (
         <motion.div
-            className={`absolute ${isMobile ? 'inset-8' : 'inset-0'} cursor-grab`}
+            className="absolute inset-0 cursor-grab"
             style={{ x, y, rotateX, rotateY, touchAction: 'none', ...(isMobile && { willChange: 'transform' }) }}
             drag
             dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
-            dragElastic={0.65}
+            dragElastic={isMobile ? 0.28 : 0.6}
             dragMomentum={false}
             dragTransition={{ bounceStiffness: 380, bounceDamping: 42 }}
             whileTap={{ cursor: 'grabbing' }}
+            onPointerDown={(e) => { dragStart.current = { x: e.clientX, y: e.clientY }; }}
             onDragEnd={handleDragEnd}
         >
             {backContent ? (
@@ -71,10 +84,10 @@ function CardRotate({ children, backContent, onSendToBack, sensitivity, disableD
                         animate={{ rotateY: isFlipped ? 180 : 0 }}
                         transition={{ type: 'spring', stiffness: 320, damping: 32 }}
                     >
-                        <div className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
+                        <div className="absolute inset-0 rounded-[2rem] overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
                             {children}
                         </div>
-                        <div className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                        <div className="absolute inset-0 rounded-[2rem] overflow-hidden" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
                             {backContent}
                         </div>
                     </motion.div>
@@ -242,7 +255,7 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
                             style={{ transformOrigin: '50% 90%', ...(isMobile && { willChange: 'transform' }) }}
                             onClick={() => shouldEnableClick && sendToBack(card.id)}
                             animate={{
-                                rotateZ: (stack.length - index - 1) * (isMobile ? 6 : 4) + rotationVal,
+                                rotateZ: (stack.length - index - 1) * (isMobile ? 3 : 4) + rotationVal,
                                 scale: 1 + index * 0.06 - stack.length * 0.06,
                             }}
                             initial={false}

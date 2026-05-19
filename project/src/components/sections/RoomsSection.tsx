@@ -32,7 +32,7 @@ export const RoomsSection: React.FC = () => {
 
     const cardBacks = useMemo(() =>
         ROOMS.map((room) => (
-            <div key={room.title} className="w-full h-full bg-white/95 backdrop-blur-xl flex flex-col p-5 overflow-y-auto">
+            <div key={room.title} className="w-full h-full rounded-[2rem] bg-white/95 backdrop-blur-xl flex flex-col p-5 overflow-y-auto">
                 <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                         <p className="text-[10px] tracking-[0.35em] uppercase text-gold/70">Room Details</p>
@@ -56,7 +56,6 @@ export const RoomsSection: React.FC = () => {
                         View gallery <Images className="w-4 h-4" />
                     </button>
                 </div>
-                <p className="mt-auto pt-3 text-center text-[9px] tracking-[0.3em] uppercase text-warmMuted/40">Swipe left / right to flip back</p>
             </div>
         )),
     [openLightbox]);
@@ -108,7 +107,9 @@ export const RoomsSection: React.FC = () => {
     }, []);
 
     return (
-        <section id="rooms" className="relative pt-16 pb-10 md:pt-24 md:pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center">
+        /* On mobile: h-dvh + flex-col so the card can flex-grow to fill exactly what remains.
+           On desktop: keeps original md:h-screen + md:justify-center behaviour. */
+        <section id="rooms" className="relative pt-8 pb-3 md:pt-24 md:pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden h-dvh md:h-screen snap-start flex flex-col md:justify-center">
             <motion.div
                 className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ivory to-transparent"
                 style={{ y: bandY }}
@@ -117,49 +118,71 @@ export const RoomsSection: React.FC = () => {
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-ivory to-transparent"
                 style={{ y: bandY }}
             />
-            <div className="max-w-7xl mx-auto px-6 sm:px-12">
+            {/* On mobile: flex-1 lets this grow to fill the section so the card fills what remains.
+                On desktop (md+): reverts to block so the existing justify-center centering works. */}
+            <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col flex-1 min-h-0 md:flex-none md:block">
 
                 <FadeUp>
-                    <div className="w-fit mb-4">
+                    <div className="w-fit mb-2 md:mb-4">
                         <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
                             <p className="section-label text-gold/70 tracking-[0.4em]">Chapter III — The Sanctuary</p>
                         </div>
                     </div>
                 </FadeUp>
 
-                <div className="mb-3">
+                <div className="mb-2 md:mb-3">
                     <MaskReveal>
-                        <h2 className="font-serif text-4xl sm:text-5xl font-light text-warmBlack leading-none mb-2">
+                        <h2 className="font-serif text-3xl sm:text-5xl font-light text-warmBlack leading-none mb-1 md:mb-2">
                             Choose your<br />
                             <em className="italic text-gold">Room.</em>
                         </h2>
                     </MaskReveal>
                     <FadeUp delay={0.2}>
-                        <p className="text-warmMuted text-sm sm:text-base max-w-2xl font-light leading-relaxed">
+                        <p className="text-warmMuted text-xs sm:text-base max-w-2xl font-light leading-relaxed">
                             Drag or tap through the stack to explore each room.
                         </p>
                     </FadeUp>
                 </div>
 
-                {/* ── Mobile: unified single card ── */}
-                <FadeUp className="lg:hidden -mx-6 mb-10">
-                    <div className="relative h-[50vh] pt-6 outline-none focus:outline-none [&_*]:outline-none">
-                        <Stack
-                            ref={stackRef}
-                            cards={cards}
-                            cardBacks={cardBacks}
-                            sensitivity={80}
-                            randomRotation
-                            sendToBackOnClick
-                            mobileDragOnly
-                            onActiveChange={(i) => startTransition(() => setActiveIndex(i))}
-                            animationConfig={{ stiffness: 460, damping: 42 }}
-                        />
-                        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
-                            <p className="text-white/70 text-[10px] tracking-[0.3em] uppercase drop-shadow">Swipe to explore</p>
+                {/* ── Mobile: card grows to fill all remaining vertical space ── */}
+                <FadeUp className="lg:hidden flex-1 flex flex-col min-h-0">
+                    <div className="flex flex-col items-center gap-3 flex-1 min-h-0 outline-none focus:outline-none [&_*]:outline-none">
+                        {/* overflow-hidden clips tilted background cards cleanly */}
+                        <div
+                            className="relative overflow-hidden rounded-[2rem]"
+                            style={{ width: 'min(300px, 82vw)', height: 'min(370px, 52vh)' }}
+                        >
+                            <Stack
+                                ref={stackRef}
+                                cards={cards}
+                                cardBacks={cardBacks}
+                                sensitivity={55}
+                                sendToBackOnClick
+                                mobileDragOnly
+                                onActiveChange={(i) => startTransition(() => setActiveIndex(i))}
+                                animationConfig={{ stiffness: 460, damping: 42 }}
+                            />
+                        </div>
+                        {/* Navigation row sits below the card */}
+                        <div className="flex items-center justify-between w-full flex-shrink-0">
+                            <p className="text-warmMuted/70 text-[9px] tracking-[0.25em] uppercase">
+                                ← flip · ↑↓ next room
+                            </p>
                             <div className="flex gap-2">
-                                <button onClick={() => stackRef.current?.prev()} className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm border border-white/30 flex items-center justify-center text-warmMuted hover:bg-white hover:text-gold transition-all duration-200" aria-label="Previous room"><ArrowLeft className="w-3.5 h-3.5" /></button>
-                                <button onClick={() => stackRef.current?.next()} className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm border border-white/30 flex items-center justify-center text-warmMuted hover:bg-white hover:text-gold transition-all duration-200" aria-label="Next room"><ArrowRight className="w-3.5 h-3.5" /></button>
+                                <button
+                                    onClick={() => stackRef.current?.prev()}
+                                    className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm border border-sand flex items-center justify-center text-warmMuted hover:bg-white hover:text-gold transition-all duration-200"
+                                    aria-label="Previous room"
+                                >
+                                    <ArrowLeft className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => stackRef.current?.next()}
+                                    className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm border border-sand flex items-center justify-center text-warmMuted hover:bg-white hover:text-gold transition-all duration-200"
+                                    aria-label="Next room"
+                                >
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
                             </div>
                         </div>
                     </div>
