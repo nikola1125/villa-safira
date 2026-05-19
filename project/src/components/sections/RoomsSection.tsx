@@ -120,7 +120,7 @@ export const RoomsSection: React.FC = () => {
                                     randomRotation
                                     sendToBackOnClick
                                     onActiveChange={setActiveIndex}
-                                    animationConfig={{ stiffness: 280, damping: 30 }}
+                                    animationConfig={{ stiffness: 400, damping: 40 }}
                                 />
                             </div>
                             <div className="flex items-center justify-between mt-4">

@@ -25,9 +25,6 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }
     function handleDragEnd(_: unknown, info: DragInfo) {
         if (Math.abs(info.offset.x) > sensitivity || Math.abs(info.offset.y) > sensitivity) {
             onSendToBack();
-        } else {
-            x.set(0);
-            y.set(0);
         }
     }
 
@@ -45,8 +42,9 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }
             style={{ x, y, rotateX, rotateY }}
             drag
             dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
-            dragElastic={0.6}
-            dragTransition={{ bounceStiffness: 180, bounceDamping: 24 }}
+            dragElastic={0.65}
+            dragMomentum={false}
+            dragTransition={{ bounceStiffness: 380, bounceDamping: 42 }}
             whileTap={{ cursor: 'grabbing' }}
             onDragEnd={handleDragEnd}
         >
