@@ -122,7 +122,7 @@ export const ReviewsSection: React.FC = () => {
         : 0;
 
     return (
-        <section id="reviews" className="relative pt-24 pb-6 bg-gradient-to-b from-cream via-ivory to-cream overflow-hidden h-screen snap-start flex flex-col justify-center">
+        <section id="reviews" className="relative pt-16 pb-10 md:pt-24 md:pb-6 bg-gradient-to-b from-cream via-ivory to-navy overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center">
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
                 style={{
@@ -132,64 +132,82 @@ export const ReviewsSection: React.FC = () => {
                 }}
             />
             <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                <div className="grid lg:grid-cols-12 gap-4 lg:gap-8 items-start">
 
-                    {/* Left — sticky column */}
-                    <div className="lg:col-span-4 space-y-4">
-                        <div>
-                            <FadeUp>
-                                <div className="w-fit mb-3">
-                                    <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-4 py-2 shadow-sm shadow-warmBlack/5">
-                                        <p className="section-label text-gold tracking-[0.4em]">Chapter VI — The Voice</p>
+                    {/* Left column */}
+                    <div className="lg:col-span-4 space-y-3 lg:space-y-4">
+
+                        {/* Mobile: heading + rating side-by-side | Desktop: stacked */}
+                        <div className="flex items-start gap-3 lg:block lg:space-y-4">
+
+                            {/* Heading block */}
+                            <div className="flex-1 min-w-0">
+                                <FadeUp>
+                                    <div className="w-fit mb-2 lg:mb-3">
+                                        <div className="inline-flex items-center bg-white/60 backdrop-blur-xl border border-sand rounded-full px-3 py-1.5 lg:px-4 lg:py-2 shadow-sm shadow-warmBlack/5">
+                                            <p className="section-label text-gold tracking-[0.4em]">Chapter VI — The Voice</p>
+                                        </div>
+                                    </div>
+                                </FadeUp>
+                                <MaskReveal>
+                                    <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-warmBlack leading-tight mb-2 lg:mb-3">
+                                        Notes from
+                                        <br />
+                                        <em className="italic text-gold">our guests.</em>
+                                    </h2>
+                                </MaskReveal>
+                                <FadeUp delay={0.2}>
+                                    <p className="hidden lg:block text-warmMuted text-base font-light leading-relaxed">Quiet words, honest impressions.</p>
+                                </FadeUp>
+                            </div>
+
+                            {/* Rating card — compact on mobile, full on desktop */}
+                            <FadeUp delay={0.18} className="w-32 flex-shrink-0 lg:w-auto">
+                                <div className="rounded-2xl lg:rounded-[2rem] bg-white/70 backdrop-blur-xl border border-sand shadow-lg shadow-warmBlack/8 p-3 lg:p-4">
+                                    <p className="text-[9px] lg:text-[10px] tracking-[0.4em] uppercase text-warmMuted/70">Overall</p>
+                                    {/* Mobile: stacked */}
+                                    <div className="mt-2 lg:hidden">
+                                        <div className="font-serif text-3xl text-warmBlack leading-none">
+                                            {reviews.length ? averageRating : '—'}
+                                        </div>
+                                        <div className="mt-1">
+                                            <StarRating rating={Math.round(averageRating) || 5} />
+                                        </div>
+                                        <p className="mt-1 text-[9px] tracking-[0.2em] uppercase text-warmMuted/70">{reviews.length} reviews</p>
+                                    </div>
+                                    {/* Desktop: side-by-side */}
+                                    <div className="hidden lg:flex mt-4 items-end justify-between gap-6">
+                                        <div>
+                                            <div className="font-serif text-4xl text-warmBlack leading-none">
+                                                {reviews.length ? averageRating : '—'}
+                                            </div>
+                                            <div className="mt-3">
+                                                <StarRating rating={Math.round(averageRating) || 5} />
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] tracking-[0.35em] uppercase text-warmMuted/70">Reviews</p>
+                                            <p className="mt-2 font-serif text-2xl text-gold">{reviews.length}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </FadeUp>
-                            <MaskReveal>
-                                <h2 className="font-serif text-3xl sm:text-4xl font-light text-warmBlack leading-tight mb-3">
-                                    Notes from
-                                    <br />
-                                    <em className="italic text-gold">our guests.</em>
-                                </h2>
-                            </MaskReveal>
-                            <FadeUp delay={0.2}>
-                                <p className="text-warmMuted text-base font-light leading-relaxed">Quiet words, honest impressions.</p>
                             </FadeUp>
                         </div>
 
-                        <FadeUp delay={0.18}>
-                            <div className="rounded-[2rem] bg-white/70 backdrop-blur-xl border border-sand shadow-2xl shadow-warmBlack/10 p-4">
-                                <p className="text-[10px] tracking-[0.45em] uppercase text-warmMuted/70">Overall</p>
-                                <div className="mt-4 flex items-end justify-between gap-6">
-                                    <div>
-                                        <div className="font-serif text-4xl text-warmBlack leading-none">
-                                            {reviews.length ? averageRating : '—'}
-                                        </div>
-                                        <div className="mt-3">
-                                            <StarRating rating={Math.round(averageRating) || 5} />
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-[10px] tracking-[0.35em] uppercase text-warmMuted/70">Reviews</p>
-                                        <p className="mt-2 font-serif text-2xl text-gold">{reviews.length}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </FadeUp>
-
                         {/* Review form */}
                         <FadeUp delay={0.25}>
-                            <div className="bg-white/80 backdrop-blur-xl p-5 rounded-[2rem] border border-sand/80 shadow-2xl shadow-warmBlack/10">
-                                <h4 className="font-serif text-lg text-warmBlack mb-4">Leave a note</h4>
+                            <div className="bg-white/80 backdrop-blur-xl p-4 lg:p-5 rounded-2xl lg:rounded-[2rem] border border-sand/80 shadow-xl shadow-warmBlack/8">
+                                <h4 className="font-serif text-base lg:text-lg text-warmBlack mb-3 lg:mb-4">Leave a note</h4>
                                 {submitted ? (
-                                    <div className="py-8 text-center">
-                                        <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-4">
-                                            <Star className="w-5 h-5 text-gold fill-gold" />
+                                    <div className="py-6 text-center">
+                                        <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
+                                            <Star className="w-4 h-4 text-gold fill-gold" />
                                         </div>
                                         <p className="text-warmBlack font-medium text-sm">Thank you!</p>
                                         <p className="text-warmMuted text-xs mt-1">Your review has been published.</p>
                                     </div>
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2 lg:space-y-3">
                                         <div>
                                             <input
                                                 type="text"
@@ -214,7 +232,7 @@ export const ReviewsSection: React.FC = () => {
                                             />
                                             {errors.country && <p className="text-red-400 text-xs mt-1 ml-2">{errors.country}</p>}
                                         </div>
-                                        <div className="flex gap-1.5 py-2 px-1">
+                                        <div className="flex gap-1.5 py-1.5 px-1">
                                             <StarRating
                                                 rating={form.rating}
                                                 interactive
@@ -235,7 +253,7 @@ export const ReviewsSection: React.FC = () => {
                                         <button
                                             onClick={handleSubmit}
                                             disabled={submitting}
-                                            className="w-full py-4 bg-navy text-white rounded-2xl text-xs font-bold tracking-[0.2em] uppercase hover:bg-navyMid disabled:opacity-60 transition-all duration-300"
+                                            className="w-full py-3 lg:py-4 bg-navy text-white rounded-xl lg:rounded-2xl text-xs font-bold tracking-[0.2em] uppercase hover:bg-navyMid disabled:opacity-60 transition-all duration-300"
                                         >
                                             {submitting ? 'Publishing...' : 'Publish'}
                                         </button>
@@ -249,31 +267,31 @@ export const ReviewsSection: React.FC = () => {
                     <div className="lg:col-span-8">
                         {reviews.length === 0 ? (
                             <FadeUp>
-                                <div className="h-72 flex flex-col items-center justify-center border-2 border-dashed border-sand rounded-[2rem] text-warmMuted/50 gap-4">
-                                    <Star className="w-8 h-8 text-sand" />
+                                <div className="h-48 lg:h-72 flex flex-col items-center justify-center border-2 border-dashed border-sand rounded-2xl lg:rounded-[2rem] text-warmMuted/50 gap-3">
+                                    <Star className="w-6 h-6 lg:w-8 lg:h-8 text-sand" />
                                     <p className="text-xs uppercase tracking-widest">Waiting for the first story…</p>
                                 </div>
                             </FadeUp>
                         ) : (
-                            <div className="columns-1 sm:columns-2 gap-6 space-y-6">
+                            <div className="columns-2 gap-3 lg:gap-6 space-y-3 lg:space-y-6">
                                 {reviews.map((rev, i) => (
                                     <FadeUp key={i} delay={i * 0.07}>
-                                        <div className="break-inside-avoid bg-white/85 backdrop-blur-xl p-7 rounded-[2rem] border border-sand/80 shadow-2xl shadow-warmBlack/10 hover:shadow-2xl hover:border-gold/25 transition-all duration-300 mb-6">
-                                            <div className="flex justify-between items-start mb-5">
-                                                <div>
-                                                    <h5 className="font-serif text-lg text-warmBlack">{rev.name}</h5>
-                                                    <p className="text-warmMuted/60 text-[10px] uppercase tracking-widest mt-0.5">
-                                                        {rev.country ?? rev.coountry}
-                                                    </p>
+                                        <div className="break-inside-avoid bg-white/85 backdrop-blur-xl p-3 lg:p-7 rounded-xl lg:rounded-[2rem] border border-sand/80 shadow-md lg:shadow-2xl shadow-warmBlack/8 hover:border-gold/25 transition-all duration-300 mb-3 lg:mb-6">
+                                            <div className="mb-2 lg:mb-5">
+                                                <h5 className="font-serif text-sm lg:text-lg text-warmBlack leading-tight truncate">{rev.name}</h5>
+                                                <p className="text-warmMuted/60 text-[9px] uppercase tracking-widest mt-0.5 truncate">
+                                                    {rev.country ?? rev.coountry}
+                                                </p>
+                                                <div className="mt-1 lg:mt-2">
+                                                    <StarRating rating={rev.rating} />
                                                 </div>
-                                                <StarRating rating={rev.rating} />
                                             </div>
-                                            <p className="text-warmMuted font-light leading-relaxed italic text-sm">
+                                            <p className="text-warmMuted font-light leading-relaxed italic text-[11px] lg:text-sm">
                                                 "{rev.comment}"
                                             </p>
                                             {rev.date && (
-                                                <div className="mt-5 pt-5 border-t border-sand/50">
-                                                    <p className="text-warmMuted/40 text-[10px] uppercase tracking-widest">
+                                                <div className="mt-2 lg:mt-5 pt-2 lg:pt-5 border-t border-sand/50">
+                                                    <p className="text-warmMuted/40 text-[9px] uppercase tracking-widest">
                                                         {rev.date}
                                                     </p>
                                                 </div>

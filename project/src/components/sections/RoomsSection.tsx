@@ -76,7 +76,7 @@ export const RoomsSection: React.FC = () => {
     }, []);
 
     return (
-        <section id="rooms" className="relative pt-24 pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden h-screen snap-start flex flex-col justify-center">
+        <section id="rooms" className="relative pt-16 pb-10 md:pt-24 md:pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center">
             <motion.div
                 className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ivory to-transparent"
                 style={{ y: bandY }}
@@ -112,21 +112,21 @@ export const RoomsSection: React.FC = () => {
                 <div className="grid lg:grid-cols-2 gap-10 lg:gap-24 items-start">
                     <FadeUp>
                         <div className="relative group">
-                            <div className="relative w-full max-w-xl mx-auto lg:mx-0 h-[62vh] outline-none focus:outline-none [&_*]:outline-none">
+                            <div className="relative w-full max-w-xl mx-auto lg:mx-0 h-[52vh] sm:h-[62vh] pr-8 md:pr-0 outline-none focus:outline-none [&_*]:outline-none">
                                 <Stack
                                     ref={stackRef}
                                     cards={cards}
                                     sensitivity={140}
                                     randomRotation
                                     sendToBackOnClick
-                                    mobileClickOnly
                                     onActiveChange={setActiveIndex}
-                                    animationConfig={{ stiffness: 240, damping: 22 }}
+                                    animationConfig={{ stiffness: 280, damping: 30 }}
                                 />
                             </div>
-                            <div className="hidden lg:flex items-center justify-between mt-4">
+                            <div className="flex items-center justify-between mt-4">
                                 <p className="text-warmMuted/70 text-[10px] tracking-[0.3em] uppercase">
-                                    Tap image to open gallery
+                                    <span className="md:hidden">Swipe to explore rooms</span>
+                                    <span className="hidden md:inline">Tap image to open gallery</span>
                                 </p>
                                 <div className="flex gap-2">
                                     <button
@@ -149,8 +149,8 @@ export const RoomsSection: React.FC = () => {
                     </FadeUp>
 
                     <FadeUp delay={0.1}>
-                        <div className="pl-2 -mt-10">
-                            <div className="bg-white/70 border border-sand rounded-[2rem] backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden min-h-[72vh] flex flex-col">
+                        <div className="pl-2 md:-mt-10">
+                            <div className="bg-white/70 border border-sand rounded-[2rem] backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden md:min-h-[72vh] flex flex-col">
                                 <div className="p-5 sm:p-6 flex flex-col flex-1">
                                     <div className="flex items-start justify-between gap-6">
                                         <div>

@@ -8,7 +8,7 @@ export const FinalCtaSection: React.FC = () => {
     return (
         <section
             id="cta"
-            className="relative pt-24 pb-6 bg-gradient-to-b from-cream via-ivory to-cream overflow-hidden h-screen snap-start flex flex-col justify-center"
+            className="relative pt-16 pb-10 md:pt-24 md:pb-6 bg-gradient-to-b from-cream via-ivory to-cream overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center"
         >
             <div
                 className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -37,7 +37,7 @@ export const FinalCtaSection: React.FC = () => {
                                         'radial-gradient(circle at 18% 12%, rgba(201,160,82,0.25) 0%, rgba(0,0,0,0) 60%), radial-gradient(circle at 80% 30%, rgba(163,179,106,0.25) 0%, rgba(0,0,0,0) 60%)',
                                 }}
                             />
-                            <div className="relative p-8 sm:p-12 lg:p-14 grid lg:grid-cols-12 gap-12 items-center">
+                            <div className="relative p-5 sm:p-10 lg:p-14 grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                                 <div className="lg:col-span-7">
                                     <MaskReveal>
                                         <h2 className="font-serif text-4xl sm:text-6xl font-light text-warmBlack leading-[1.05]">

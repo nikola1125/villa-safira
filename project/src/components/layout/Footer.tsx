@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
     };
 
     return (
-        <footer id="contact" className="relative overflow-hidden bg-gradient-to-b from-navy via-navyMid to-[#060b15] text-white pt-24 pb-6 h-screen snap-start flex flex-col justify-center">
+        <footer id="contact" className="relative overflow-x-hidden md:overflow-hidden bg-gradient-to-b from-navyMid to-[#060b15] text-white pt-16 pb-10 md:pt-24 md:pb-6 md:h-screen snap-start md:flex md:flex-col md:justify-center">
             <div
                 className="absolute inset-0 opacity-[0.03] pointer-events-none"
                 style={{
@@ -33,7 +33,7 @@ export const Footer: React.FC = () => {
                 }}
             />
             <div className="max-w-7xl mx-auto px-6 sm:px-12">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-20">
 
                     {/* Brand */}
                     <FadeUp>

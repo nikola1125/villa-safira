@@ -4,7 +4,7 @@ import { AMENITIES } from '../../data';
 
 export const AmenitiesSection: React.FC = () => {
     return (
-        <section id="amenities" className="relative pt-24 pb-6 bg-gradient-to-b from-cream via-ivory to-cream border-y border-sand overflow-hidden h-screen snap-start flex flex-col justify-center">
+        <section id="amenities" className="relative pt-16 pb-10 md:pt-24 md:pb-6 bg-gradient-to-b from-cream via-ivory to-cream border-y border-sand overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center">
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
                 style={{
@@ -23,7 +23,7 @@ export const AmenitiesSection: React.FC = () => {
                     </div>
                 </FadeUp>
 
-                <div className="mb-6">
+                <div className="mb-4">
                     <FadeUp>
                         <h2 className="font-serif text-5xl sm:text-6xl font-light text-warmBlack leading-[0.95]">
                             Light, quiet,
@@ -39,17 +39,17 @@ export const AmenitiesSection: React.FC = () => {
                 </div>
 
                 {/* Amenities grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
+                <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6">
                     {AMENITIES.slice(0, 8).map((item, i) => (
-                        <FadeUp key={item.label} delay={i * 0.04}>
-                            <div className="group bg-white/70 backdrop-blur-xl border border-sand rounded-[2rem] p-6 shadow-sm shadow-warmBlack/5 hover:shadow-lg hover:shadow-warmBlack/10 hover:border-gold/25 transition-all duration-300">
-                                <div className="w-12 h-12 rounded-2xl bg-ivory border border-sand flex items-center justify-center text-navy mb-4 group-hover:bg-navy group-hover:text-gold transition-colors duration-300">
-                                    <item.icon strokeWidth={1.5} className="w-6 h-6" />
+                        <FadeUp key={item.label} delay={i * 0.04} className="h-full">
+                            <div className="group h-full bg-white/70 backdrop-blur-xl border border-sand rounded-xl sm:rounded-[1.5rem] p-3 sm:p-6 shadow-sm shadow-warmBlack/5 hover:shadow-lg hover:shadow-warmBlack/10 hover:border-gold/25 transition-all duration-300">
+                                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-ivory border border-sand flex items-center justify-center text-navy mb-2 sm:mb-4 group-hover:bg-navy group-hover:text-gold transition-colors duration-300">
+                                    <item.icon strokeWidth={1.5} className="w-4 h-4 sm:w-6 sm:h-6" />
                                 </div>
-                                <h4 className="font-serif text-lg text-warmBlack mb-2 group-hover:text-goldDark transition-colors duration-300">
+                                <h4 className="font-sans text-[11px] sm:font-serif sm:text-lg text-warmBlack mb-0 sm:mb-2 leading-tight group-hover:text-goldDark transition-colors duration-300">
                                     {item.label}
                                 </h4>
-                                <p className="text-warmMuted text-sm leading-relaxed">{item.desc}</p>
+                                <p className="hidden sm:block text-warmMuted text-sm leading-relaxed">{item.desc}</p>
                             </div>
                         </FadeUp>
                     ))}

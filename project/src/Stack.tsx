@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform } from 'motion/react';
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import type { ReactNode } from 'react';
 
 interface CardRotateProps {
@@ -46,6 +46,7 @@ function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }
             drag
             dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
             dragElastic={0.6}
+            dragTransition={{ bounceStiffness: 180, bounceDamping: 24 }}
             whileTap={{ cursor: 'grabbing' }}
             onDragEnd={handleDragEnd}
         >
@@ -105,6 +106,14 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
     const [stack, setStack] = useState<{ id: number; content: ReactNode }[]>(() => {
         return cards.map((content, index) => ({ id: index + 1, content }));
     });
+
+    const rotationsRef = useRef<Map<number, number>>(new Map());
+    const getRotation = (id: number) => {
+        if (!rotationsRef.current.has(id)) {
+            rotationsRef.current.set(id, Math.random() * 10 - 5);
+        }
+        return rotationsRef.current.get(id)!;
+    };
 
     useEffect(() => {
         if (cards.length) {
@@ -169,7 +178,7 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
             onMouseLeave={() => pauseOnHover && setIsPaused(false)}
         >
             {stack.map((card, index) => {
-                const rotationVal = randomRotation ? Math.random() * 10 - 5 : 0;
+                const rotationVal = randomRotation ? getRotation(card.id) : 0;
                 return (
                     <CardRotate
                         key={card.id}
@@ -179,11 +188,11 @@ const Stack = forwardRef<StackHandle, StackProps>(function Stack({
                     >
                         <motion.div
                             className="rounded-2xl overflow-hidden w-full h-full"
+                            style={{ transformOrigin: '90% 90%' }}
                             onClick={() => shouldEnableClick && sendToBack(card.id)}
                             animate={{
                                 rotateZ: (stack.length - index - 1) * 4 + rotationVal,
                                 scale: 1 + index * 0.06 - stack.length * 0.06,
-                                transformOrigin: '90% 90%'
                             }}
                             initial={false}
                             transition={{

@@ -8,16 +8,25 @@ import { StorySection } from './components/sections/StorySection';
 import { RoomsSection } from './components/sections/RoomsSection';
 import { AmenitiesSection } from './components/sections/AmenitiesSection';
 import { ReviewsSection } from './components/sections/ReviewsSection';
-import { FinalCtaSection } from './components/sections/FinalCtaSection';
 import { openWhatsApp } from './utils';
 
-const SECTION_IDS = ['hero', 'highlights', 'story', 'rooms', 'amenities', 'reviews', 'cta', 'contact'];
+const SECTION_IDS = ['hero', 'highlights', 'story', 'rooms', 'amenities', 'reviews', 'contact'];
 const TOTAL = SECTION_IDS.length;
 const COOLDOWN = 850;
 
 const App: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isMobile, setIsMobile] = useState(
+        () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+    );
     const lastMove = useRef(0);
+
+    useEffect(() => {
+        const media = window.matchMedia('(max-width: 768px)');
+        const update = () => setIsMobile(media.matches);
+        media.addEventListener('change', update);
+        return () => media.removeEventListener('change', update);
+    }, []);
 
     const goTo = (index: number) => {
         const clamped = Math.min(Math.max(index, 0), TOTAL - 1);
@@ -27,6 +36,22 @@ const App: React.FC = () => {
     };
 
     useEffect(() => {
+        if (!isMobile) return;
+        const handleNavigateTo = (e: Event) => {
+            const id = (e as CustomEvent).detail as string;
+            const el = document.getElementById(id);
+            if (el) {
+                const offset = el.getBoundingClientRect().top + window.scrollY - 68;
+                window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+            }
+        };
+        window.addEventListener('navigate-to', handleNavigateTo);
+        return () => window.removeEventListener('navigate-to', handleNavigateTo);
+    }, [isMobile]);
+
+    useEffect(() => {
+        if (isMobile) return;
+
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
             if (Date.now() - lastMove.current < COOLDOWN) return;
@@ -51,15 +76,59 @@ const App: React.FC = () => {
             if (idx >= 0) goTo(idx);
         };
 
+        let touchStartY = 0;
+        const handleTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+        const handleTouchEnd = (e: TouchEvent) => {
+            const delta = touchStartY - e.changedTouches[0].clientY;
+            if (Math.abs(delta) < 50 || Date.now() - lastMove.current < COOLDOWN) return;
+            setCurrentIndex(prev => {
+                const next = Math.min(Math.max(prev + (delta > 0 ? 1 : -1), 0), TOTAL - 1);
+                lastMove.current = Date.now();
+                window.dispatchEvent(new CustomEvent('section-change', { detail: next }));
+                return next;
+            });
+        };
+
         window.addEventListener('wheel', handleWheel, { passive: false });
         window.addEventListener('keydown', handleKey);
         window.addEventListener('navigate-to', handleNavigateTo);
+        window.addEventListener('touchstart', handleTouchStart, { passive: true });
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
         return () => {
             window.removeEventListener('wheel', handleWheel);
             window.removeEventListener('keydown', handleKey);
             window.removeEventListener('navigate-to', handleNavigateTo);
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchend', handleTouchEnd);
         };
-    }, [currentIndex]);
+    }, [currentIndex, isMobile]);
+
+    const whatsAppBtn = (
+        <button
+            onClick={openWhatsApp}
+            className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white rounded-full shadow-lg shadow-black/25 flex items-center justify-center hover:scale-110 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all duration-300"
+            aria-label="Chat on WhatsApp"
+            style={{ width: '52px', height: '52px' }}
+        >
+            <Phone className="w-5 h-5" />
+        </button>
+    );
+
+    if (isMobile) {
+        return (
+            <div className="font-sans bg-ivory text-warmBlack overflow-x-hidden">
+                <Navbar />
+                <HeroSection />
+                <HighlightsSection />
+                <StorySection />
+                <RoomsSection />
+                <AmenitiesSection />
+                <ReviewsSection />
+                <Footer />
+                {whatsAppBtn}
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 overflow-hidden font-sans bg-ivory text-warmBlack">
@@ -78,19 +147,10 @@ const App: React.FC = () => {
                 <RoomsSection />
                 <AmenitiesSection />
                 <ReviewsSection />
-                <FinalCtaSection />
                 <Footer />
             </div>
 
-            {/* WhatsApp floating button */}
-            <button
-                onClick={openWhatsApp}
-                className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white rounded-full shadow-lg shadow-black/25 flex items-center justify-center hover:scale-110 hover:shadow-xl hover:shadow-[#25D366]/30 transition-all duration-300"
-                aria-label="Chat on WhatsApp"
-                style={{ width: '52px', height: '52px' }}
-            >
-                <Phone className="w-5 h-5" />
-            </button>
+            {whatsAppBtn}
         </div>
     );
 };

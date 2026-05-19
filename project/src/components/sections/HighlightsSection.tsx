@@ -9,7 +9,7 @@ export const HighlightsSection: React.FC = () => {
     return (
         <section
             id="highlights"
-            className="relative pt-24 pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-hidden h-screen snap-start flex flex-col justify-center"
+            className="relative pt-16 pb-10 md:pt-24 md:pb-6 bg-gradient-to-b from-ivory via-cream to-ivory overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center"
         >
             <div
                 className="absolute inset-0 opacity-[0.035] pointer-events-none"
@@ -50,7 +50,7 @@ export const HighlightsSection: React.FC = () => {
                         </FadeUp>
 
                         <FadeUp delay={0.35}>
-                            <div className="mt-10 rounded-[2rem] border border-sand bg-white/70 backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden">
+                            <div className="mt-6 md:mt-10 rounded-[2rem] border border-sand bg-white/70 backdrop-blur-xl shadow-2xl shadow-warmBlack/10 overflow-hidden">
                                 <div className="p-7 sm:p-9">
                                     <div className="flex items-center justify-between gap-6">
                                         <p className="text-[10px] tracking-[0.45em] uppercase text-warmMuted/80">Today’s best move</p>
@@ -62,7 +62,7 @@ export const HighlightsSection: React.FC = () => {
                                     <p className="mt-4 font-serif text-2xl sm:text-3xl text-warmBlack leading-snug">
                                         Reserve now, then arrive to calm.
                                     </p>
-                                    <div className="mt-7 flex flex-col sm:flex-row gap-4">
+                                    <div className="mt-5 md:mt-7 flex flex-col sm:flex-row gap-3">
                                         <button
                                             onClick={handleBookNow}
                                             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-navy text-white rounded-full text-xs tracking-[0.25em] uppercase font-semibold hover:bg-navyMid transition-all duration-300 shadow-lg shadow-navy/15"
@@ -98,7 +98,7 @@ export const HighlightsSection: React.FC = () => {
                         </FadeUp>
                     </div>
 
-                    <div className="lg:col-span-6">
+                    <div className="lg:col-span-6 hidden md:block">
                         <FadeUp delay={0.1}>
                             <div className="grid sm:grid-cols-2 gap-4">
                                 {[

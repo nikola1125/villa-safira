@@ -6,11 +6,26 @@ import { handleBookNow, scrollToSection } from '../../utils';
 export const Navbar: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(
+        () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+    );
+
+    useEffect(() => {
+        const media = window.matchMedia('(max-width: 768px)');
+        const update = () => setIsMobile(media.matches);
+        media.addEventListener('change', update);
+        return () => media.removeEventListener('change', update);
+    }, []);
 
     useEffect(() => {
         const onSectionChange = (e: Event) => setIsScrolled((e as CustomEvent).detail > 0);
+        const onScroll = () => setIsScrolled(window.scrollY > 60);
         window.addEventListener('section-change', onSectionChange);
-        return () => window.removeEventListener('section-change', onSectionChange);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            window.removeEventListener('section-change', onSectionChange);
+            window.removeEventListener('scroll', onScroll);
+        };
     }, []);
 
     const handleNav = (id: string) => {
@@ -56,15 +71,14 @@ export const Navbar: React.FC = () => {
                         <motion.img
                             src="/logo.jpg"
                             alt="Villa Safira"
-                            initial={{ height: 100, opacity: 0 }}
+                            initial={{ height: isMobile ? 68 : 100, opacity: 0 }}
                             animate={{
-                                height: isScrolled ? 60 : 100,
+                                height: isMobile ? (isScrolled ? 46 : 68) : (isScrolled ? 60 : 100),
                                 opacity: 1,
                             }}
                             transition={{ duration: 0.4, ease: 'easeOut' }}
                             className="w-auto object-contain rounded-full border border-sand/20 shadow-md"
                             style={{
-                                height: 100,
                                 imageRendering: 'auto',
                                 transform: 'translateZ(0)',
                                 backfaceVisibility: 'hidden'

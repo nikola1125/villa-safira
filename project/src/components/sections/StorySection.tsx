@@ -6,7 +6,7 @@ import { STORY_STATS } from '../../data';
 
 export const StorySection: React.FC = () => {
     return (
-        <section id="story" className="relative bg-gradient-to-b from-ivory via-cream to-ivory text-warmBlack pt-24 pb-6 overflow-hidden h-screen snap-start flex flex-col justify-center">
+        <section id="story" className="relative bg-gradient-to-b from-ivory via-cream to-ivory text-warmBlack pt-16 pb-10 md:pt-24 md:pb-6 overflow-x-hidden md:overflow-hidden md:h-screen snap-start md:flex md:flex-col md:justify-center">
             <div
                 className="absolute inset-0 opacity-[0.04] pointer-events-none"
                 style={{
@@ -54,7 +54,7 @@ export const StorySection: React.FC = () => {
                         </FadeUp>
                     </div>
 
-                    <FadeUp delay={0.1} className="lg:col-span-6">
+                    <FadeUp delay={0.1} className="lg:col-span-6 hidden md:block">
                         <div className="grid grid-cols-12 gap-4 sm:gap-6">
                             <div className="col-span-7">
                                 <div className="relative h-[58vh] rounded-[2.25rem] overflow-hidden shadow-2xl shadow-warmBlack/10">

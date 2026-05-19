@@ -22,7 +22,7 @@ export const HeroSection: React.FC = () => {
     const heroScale = useTransform(scrollY, [0, 800], [1, enableParallax ? 1.06 : 1]);
 
     return (
-        <section id="hero" className="relative overflow-hidden h-screen snap-start">
+        <section id="hero" className="relative overflow-hidden min-h-screen md:h-screen snap-start">
             <motion.div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
@@ -44,7 +44,7 @@ export const HeroSection: React.FC = () => {
             />
 
             <div className="relative z-10">
-                <div className="max-w-7xl mx-auto px-6 sm:px-12 pt-36 sm:pt-40 pb-16 sm:pb-24">
+                <div className="max-w-7xl mx-auto px-6 sm:px-12 pt-28 md:pt-40 pb-14 sm:pb-24">
                     <div className="grid lg:grid-cols-12 gap-10 items-end">
                         <div className="lg:col-span-7">
                             <motion.div
